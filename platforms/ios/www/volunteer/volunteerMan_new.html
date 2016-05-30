@@ -1,0 +1,643 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+<script type="text/javascript"  src="../js/common/kakao.js"></script>
+
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        function apmStr(hour) {
+        	var str = "오전";
+        	if(parseInt(hour) > 11){
+        		str = "오후";
+        	}
+        	return str;
+        }
+        
+        function apmFormat(hour) {
+        	var rhour = parseInt(hour);
+        	if(parseInt(hour) > 12){
+        		rhour = (rhour - 12);
+        	}
+        	return rhour;
+        }
+        
+        function insertVolunteerMan(vtrNo) {
+        	if(confirm("참여 하시겠습니까?")) {
+
+        		if($('#insertYN').val() == "N"){
+        			navigatorAlert("모집인원이 마감되어 참여하실 수 없습니다.");
+	          		return;
+	          	}
+        		
+        		if($('#vtmHpNo').val() == ""){
+        			navigatorAlert("휴대폰번호를 입력 해주세요.");
+	          		$('#vtmHpNo').focus();
+	          		return;
+	          	}
+        		
+				var tel = $('#vtmHpNo').val();
+				tel = tel.replace("-", "");
+				if(tel.length < 10){
+					navigatorAlert("휴대폰번호를 정확히 입력 해주세요.");
+	          		$('#vtmHpNo').focus();
+	          		return;
+	          	}
+
+        		if($('#vtmReason').val() == ""){
+        			navigatorAlert("참여이유를 입력 해주세요.");
+	          		$('#vtmReason').focus();
+	          		return;
+	          	}
+		        	$.ajax({
+		  		        type: "POST",
+		  		        url: serverUrl+"/tdd/volunteer/insertVolunteerMan.do",
+		  		        data: $("#regForm").serialize(),
+		  		      	async: false,
+		  		        dataType: "json", 
+		  		        success: function(res) {
+		  		        	
+		  		        	if(res.result == "S"){
+		  		        		navigatorAlert("참여해주셔서 감사합니다");
+		  		        		var str ="";
+		  		        		var hpNo = $("#vtmHpNo").val();
+		  		        		var memberName = window.localStorage.getItem("memberName");
+	  	  	            			str ='<tr><td>'+memberName+'</td>';
+	  	  	            			
+								var maskingData = "";
+	  	  	  					//01055551111
+	  	  	  					if(hpNo.length > 10){
+	  	  	  						maskingData = hpNo.substring(0,3)+"-"+hpNo.substring(3,5)+"**"+"-****";	
+	  	  	  					//0117554575
+	  	  	  					}else if(hpNo.length > 9){
+	  	  	  						maskingData = hpNo.substring(0,3)+"-"+hpNo.substring(3,5)+"*"+"-****";	
+	  	  	  					}else{
+	  	  	  						maskingData = hpNo.substring(0,2)+"-"+hpNo.substring(2,4)+"*"+"-****";	
+	  	  	  					}
+	  	  	            			
+	  	  	            			str +='<td>'+maskingData+'</td>';
+		  	            			str +='<td>'+$("#vtmReason").val()+'</td></tr>';
+		  	            			$("#tListBody").prepend(str);
+		  		        		$("#vtmHpNo").val("");
+		  		        		$("#vtmReason").val("");
+		  		        		
+		  		        	}else if(res.result == "D"){
+		  		        		navigatorAlert("이미 참여 되었습니다.");
+		  		        		$("#vtmHpNo").val("");
+		  		        		$("#vtmReason").val("");
+		  		        	}else{
+		  		        		navigatorAlert("참여가 실패되었습니다.");
+		  		        		$("#vtmHpNo").val("");
+		  		        		$("#vtmReason").val("");
+		  		        	}
+		  	            	
+		  		        }
+		  		    }); 
+        	}
+        }
+        
+        function scrollManList(page,vtrNo) {
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectVolunteerManList.do",
+  		        data: {"page":page,"vtrNo":vtrNo},
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+  		        	var manList =res.resultSubData;
+  		        	var manListLeng =res.resultSubDataLeng;
+  		        	
+  		        	if(manListLeng > 0){
+	  	  	            	$.each(manList, function() {
+	  	  	            		var str ="";
+	  	  	            			str ='<tr><td>'+this.vtmMemberId+'</td>';
+	  	  	            			
+	  	  	            		var maskingData = "";
+	  	  	  	  	  			
+	  	  	  					//01055551111
+	  	  	  					if(this.vtmHpNo.length > 10){
+	  	  	  						maskingData = this.vtmHpNo.substring(0,3)+"-"+this.vtmHpNo.substring(3,5)+"**"+"-****";	
+	  	  	  					//0117554575
+	  	  	  					}else if(this.vtmHpNo.length > 9){
+	  	  	  						maskingData = this.vtmHpNo.substring(0,3)+"-"+this.vtmHpNo.substring(3,5)+"*"+"-****";	
+	  	  	  					}else{
+	  	  	  						maskingData = this.vtmHpNo.substring(0,2)+"-"+this.vtmHpNo.substring(2,4)+"*"+"-****";	
+	  	  	  					}
+	  	  	  					
+	  	  	            			str +='<td>'+maskingData+'</td>';
+	  	  	            			if( window.localStorage.getItem("memberId") == this.regId){
+	  	  	            				str += '<td>';
+	  	  	            					str += '<div class="cancel">';
+  	  	            						str += this.vtmReason;
+	  	  	            						str += '<a href="javascript:cancelVolunteerMan();" class="btn btnC_05 btn_p_04">';
+	  	  	            						str += '<span>취소</span>';
+	  	  	            						str += '</a>';
+	  	  	            					str += '</div>';
+	  	  	            				str += '</td></tr>';
+	  	  	            				
+	  	  	            			}else{
+	  	  	  	            			str +='<td>'+this.vtmReason+'</td></tr>';
+	  	  	            			}
+	  	  	            			$("#tListBody").append(str);
+	  	  	                    
+	  	  	                });
+	  				}
+  		        }
+  		    }); 
+        }
+        
+        $(document).ready(function(){
+        	
+        	var vtmMemberName = window.localStorage.getItem("memberName");
+        	var vtmMemberId = window.localStorage.getItem("memberId");
+        	var vtrNo = getParameter('vtrNo');
+        	var vtrManCnt = getParameter('vtrManCnt');
+        	var vtrRecruitment = getParameter('vtrRecruitment');
+        	if(parseInt(vtrManCnt) == parseInt(vtrRecruitment)){
+        		$("#insertYN").val("N");
+        	}
+        	
+        	$('#modifyButton').attr('onclick', 'volunteerDtl('+vtrNo+',"'+vtrManCnt+'","'+vtrRecruitment+'")');
+        	
+        	$("#vtrNo").val(vtrNo);
+        	$("#vtmMemberName").val(vtmMemberName);
+        	$("#vtmMemberId").val(vtmMemberId);
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectVolunteer.do",
+  		        data: {"vtrNo" : vtrNo},
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+  		        	var volunteer =res.resultData;
+  		        	var manList =res.resultSubData;
+  		        	var manListLeng =res.resultSubDataLeng;
+  		        	var volunteerTelNo ="";
+  		        	$('#howMany').html('('+vtrManCnt+'/'+vtrRecruitment+')')
+  		        	$("#memberName").text(volunteer.memberName);
+  		        	$("#telNo").text(volunteer.telNo);
+  		        	if("" == volunteer.vtrSi ){
+  		        		$("#vtrSiGu").text("전체");
+  		        		$("#vtrVoteGu").text("전체");
+  		        	}else{
+  		        		$("#vtrSiGu").text(volunteer.vtrSi +' ' +volunteer.vtrGu);
+  		        		$("#vtrVoteGu").text(volunteer.vtrVoteGu);
+  		        	}
+  		        
+  		        	
+  		        	if( vtmMemberId == volunteer.memberId){
+  		        		$('#modiButton').attr('style', 'display:block');
+  		        		$('#smsButton').attr('style', 'display:block');
+  		        	}
+  		        	
+  		        	var arrSDate =volunteer.vtrPossibleDate.split('-');
+  		        	var arrEDate =volunteer.vtrEndDate.split('-');
+  		        
+  		        	var strDate =arrSDate[0]+'년 '+arrSDate[1]+'월 '+arrSDate[2]+'일 '+apmStr(volunteer.vtrPossibleHour)+' ';
+  		        	strDate +=apmFormat(volunteer.vtrPossibleHour)+'시 '+volunteer.vtrPossibleMinute+'분<span class="block">~';
+  		        	strDate +=arrEDate[0]+'년 '+arrEDate[1]+'월 '+arrEDate[2]+'일 '+apmStr(volunteer.vtrEndHour)+' ';
+  		        	strDate +=apmFormat(volunteer.vtrEndHour)+'시 '+volunteer.vtrEndMinute+'분</span>';
+  		        	$("#sDateTime").html(strDate);
+  		        
+  		        	
+  		        	$("#vtrField").text(volunteer.vtrField);
+  		        	$("#vtrRecruitment").text(volunteer.vtrManCnt+"\/"+ volunteer.vtrRecruitment+"명");
+  		        	$("#vtrContent").text(volunteer.vtrContent);
+
+  		        	var dummySet = "[자원봉사]";
+  		        	dummySet += "["+volunteer.vtrVoteGu+"]["+volunteer.vtrManCnt+"\/"+ volunteer.vtrRecruitment+"명]";
+//   		        	try {
+//   		        		dummySet += volunteer.vtrContent.substring(0, 100);
+//   					} catch (e) {
+//   						console.log(e);
+//   						dummySet += volunteer.vtrContent;
+//   					}
+  					dummySet += volunteer.vtrContent;
+  					$('#dummy').text(dummySet);
+                    
+                    var metatag = '';
+                    var url ='';
+                    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+                        url = androidUrl;
+                    } else {
+                        url = iphoneUrl;
+                    }
+                    metatag += '<meta property="og:url"           content="'+url+'" />';
+                    metatag += '<meta property="og:type"          content="article" />';
+                    metatag += '<meta property="og:title"         content="'+volunteer.vtrVoteGu+'"/>" />';
+                    metatag += '<meta property="og:description"   content="'+$('#dummy').text()+'" />';
+                    metatag += '<meta property="og:image"         content="' + serverUrl + '/images/main_icon.png" />';
+                    $('head').append(metatag);
+
+//   		        	if(vtmMemberId == volunteer.memberId){
+  		        		$("#scrollYN").val("Y"); 
+  		        		$("#memCodeCheck").show();
+  	  		        	if(manListLeng > 0){
+  	  	  	            	$.each(manList, function() {
+  	  	  	            		var str ="";
+  	  	  	            			str ='<tr><td>'+this.vtmMemberId+'</td>';
+  	  	  	            			
+  	  	  	            		var maskingData = "";
+  	  	  	  			
+  	  	  					//01055551111
+  	  	  					if(this.vtmHpNo.length > 10){
+  	  	  						maskingData = this.vtmHpNo.substring(0,3)+"-"+this.vtmHpNo.substring(3,5)+"**"+"-****";	
+  	  	  					//0117554575
+  	  	  					}else if(this.vtmHpNo.length > 9){
+  	  	  						maskingData = this.vtmHpNo.substring(0,3)+"-"+this.vtmHpNo.substring(3,5)+"*"+"-****";	
+  	  	  					}else{
+  	  	  						maskingData = this.vtmHpNo.substring(0,2)+"-"+this.vtmHpNo.substring(2,4)+"*"+"-****";	
+  	  	  					}
+  	  	  	            			str +='<td>'+maskingData+'</td>';
+  	  	  	            			
+  	  	  	            			if( window.localStorage.getItem("memberId") == this.regId){
+  	  	  	            				str += '<td>';
+  	  	  	            					str += '<div class="cancel">';
+	  	  	            						str += this.vtmReason;
+  	  	  	            						str += '<a href="javascript:cancelVolunteerMan();" class="btn btnC_05 btn_p_04">';
+  	  	  	            						str += '<span>취소</span>';
+  	  	  	            						str += '</a>';
+  	  	  	            					str += '</div>';
+  	  	  	            				str += '</td></tr>';
+  	  	  	            				
+  	  	  	            			}else{
+  	  	  	  	            			str +='<td>'+this.vtmReason+'</td></tr>';
+  	  	  	            			}
+  	  	  	            			$("#tListBody").append(str);
+  	  	  	            		/* <td>
+									<div class="cancel">
+										자원봉사에 참여하고 싶습니다.
+										<a href="#none" class="btn btnC_05 btn_p_04">
+											<span>취소</span>
+										</a>
+									</div>
+								</td> */
+  	  	  	                });
+  	  					}
+
+//   		        }
+	
+  		        }
+  		    }); 
+        	
+   			//스크롤
+   			
+       		   $(window).scroll(function(){
+       			if($("#scrollYN").val() == "Y"){
+      		       if($(document).height()==$(window).scrollTop()+$(window).height()){
+      		    	 var page = $("#page").val();
+      		    	   page = parseInt(page) + 1;
+      		    	  $("#page").val(page);
+      		    	scrollManList(page,vtrNo);
+      		       }
+       			}
+      		   });
+
+        });
+        
+        
+				        var share = 0;
+				        function snsshare(snstype) {
+				            var url = '';
+				            if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+				                url = androidUrl;
+				            } else {
+				                url = iphoneUrl;
+				            }
+				            
+				            var subject = $('#vtrVoteGu').text();
+				            var content = $('#dummy').text();
+				            try {
+				            	content = content.substring(0,100)+"...";
+							} catch (e) {
+								console.log(e);
+							}
+				            
+				            
+				            if(snstype == 'facebook') {
+				                url = 'http://www.facebook.com/share.php?u='+url+'&title='+subject;
+				            } else if(snstype == 'twitter') {
+				                url = 'http://twitter.com/intent/tweet?text='+encodeURIComponent(content)+ '&url=' + encodeURIComponent(url);
+				            } else if('band') {
+				                var url = "http://www.band.us/plugin/share?body="+encodeURIComponent(content)+" "+encodeURIComponent(url);
+				            }
+				            
+				            //sns(offerid, snstype);
+				            window.open(url, 'sns', 'width=580, height=580, menubar=no, status=no, toolbar=no');
+				        }
+				
+				Kakao.init('fb47416198b476028f6831646558a892');
+				
+				function snsKakaoTalkShare()  {
+				
+				var url = '';
+				if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+				url = androidUrl;
+				var dummy = $('#dummy').text();
+// 				try {
+// 					dummy = dummy.substring(0, 100)+"...";
+// 				} catch (e) {
+// 					console.log(e);
+// 				}
+				var kaurl = Kakao.Link.sendTalkLink({
+				  label: $('#vtrVoteGu').text(),
+				  webLink: {
+				  text: dummy,
+				  url: url
+				  },
+				  image: { // 80 * 80 이상
+				  src: serverUrl +  '/images/main_icon.png',
+				  width: '81',
+				  height: '81'
+				  }
+				  }); 
+				window.CallApp.fnCaCaoLink(kaurl);
+				} else {
+				url = iphoneUrl;
+				var dummy = $('#dummy').text();
+// 				try {
+// 					dummy = dummy.substring(0, 100)+"...";
+// 				} catch (e) {
+// 					console.log(e);
+// 				}
+				
+				
+				Kakao.Link.sendTalkLink1({
+				  label: $('#vtrVoteGu').text(),
+				  webLink: {
+				  text: dummy,
+				  url: url
+				  },
+				  image: { // 80 * 80 이상
+				  src: serverUrl +  '/images/main_icon.png',
+				  width: '81',
+				  height: '81'
+				  }
+				  }); 
+				}
+				
+				}
+				
+				function snsKakaoStoryShare() {
+				
+				var url = '';
+				var dummy = $('#dummy').text();
+				try {
+					dummy = dummy.substring(0, 100)+"...";
+				} catch (e) {
+					console.log(e);
+				}
+				
+				if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+				url = androidUrl;
+				} else {
+				url = iphoneUrl;
+				}
+				
+				Kakao.Story.share({
+				            url: url ,
+				            text: dummy
+				            });
+				}
+
+				
+				 function volunteerDtl(pVtrNo,vtrManCnt,vtrRecruitment) {
+			        	location.href = 'volunteerModify.html?vtrNo='+pVtrNo+'&vtrManCnt='+vtrManCnt+'&vtrRecruitment='+vtrRecruitment;
+			     }
+				 
+				 function cancelVolunteerMan(){
+					 var vtrNo = getParameter('vtrNo');
+					 var memberId = window.localStorage.getItem("memberId");
+					 
+					 $.ajax({
+			  		        type: "POST",
+			  		        url: serverUrl+"/tdd/volunteer/cancelVolunteerMan.do",
+			  		        data: {
+			  		        	"vtrNo" 			: 	vtrNo
+			  		        	,"vtmMemberId"		:	memberId
+			  		        },
+			  		      	async: false,
+			  		        dataType: "json", 
+			  		        success: function(res) {
+								if( res.status=="success" ){
+				            	    alert('취소되었습니다');
+				            	   	location.href = 'volunteerSearch.html';
+								}else{
+									alert('통신 장애');
+								}
+			  	            	
+			  		        }
+			  		    });
+				 }
+				 
+				function smsSend(){
+					alert('오나.');
+					var smsMsg = $('#smsMsg').val();
+					var memberId = window.localStorage.getItem("memberId");
+					var vtrNo = getParameter('vtrNo');
+
+					$.ajax({
+		  		        type: "POST",
+		  		        url: serverUrl+"/tdd/volunteer/sendSms.do",
+		  		        data: {
+		  		        	"vtrNo" 			: 	vtrNo
+		  		        	,"vtmMemberId"		:	memberId
+		  		        	,"smsMsg"			:	smsMsg
+		  		        },
+		  		      	async: false,
+		  		        dataType: "json", 
+		  		        success: function(res) {
+							if( res.status=="success" ){
+			            	    alert('발송되었습니다');
+			            	   	location.href = 'volunteerSearch.html';
+							}else{
+								alert('통신 장애');
+							}
+		  	            	
+		  		        }
+		  		    });
+				}
+</script>
+
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+	<div class="pop_layer pop_p02">
+		<div class="pop_container">
+			<ul>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaotalk.png" alt="카카오톡" /></span> 카카오톡</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaostory.png" alt="카카오스토리" /></span>카카오스토리</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/band.png" alt="네이버밴드" /></span>네이버 밴드</a></li>
+				<!-- <li><a href="#none"><span class="sns"><img src="../img/sns/facebook.png" alt="페이스북" /></span>페이스북</a></li> -->
+				<li><a href="#none"><span class="sns"><img src="../img/sns/twitter.png" alt="트위터" /></span>트위터</a></li>
+			</ul>
+		</div>
+	</div><!-- // pop_up -->
+	<div id="header" class="view h_c_03">
+		<div class="header_wrap">
+			<p class="header_subj">자원봉사 모집하기</p>
+			<a href="../volunteer/volunteerSearch.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+			<a href="#none" class="arw_btn" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon_02.png" alt="공유하기" /></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="resource_grp">
+			<!-- 20160302 수정 -->
+			<div class="resource_tbl">
+				<div class="tbl_type_05">
+					<table>
+						<caption>이름,대표번호,지역선택,선거구 선택,가능시간,자원봉사분야,모집인원,내용을 가리키는 표</caption>
+						<colgroup>
+							<col style="width:105px;" />
+							<col />
+						</colgroup>
+						<tbody>
+							<tr>
+								<th scope="row">이름</th>
+								<td id="memberName"></td>
+							</tr>
+							<tr class="tr_line">
+								<th scope="row">대표번호</th>
+								<td id="telNo"></td>
+							</tr>
+							<tr>
+								<th scope="row">지역선택</th>
+								<td id="vtrSiGu"></td>
+							</tr>
+							<tr>
+								<th scope="row">선거구 선택</th>
+								<td id="vtrVoteGu"></td>
+							</tr>
+							<tr class="tr_line">
+								<th scope="row">가능시간</th>
+								<td class="time" id="sDateTime">2016년 4월 10일 오전 10시 30분 <span class="block">~ 2016년 4월 10일 오전 10시 30분</span></td>
+							</tr>
+							<tr class="tr_line">
+								<th scope="row">자원봉사분야</th>
+								<td id="vtrField"></td>
+							</tr>
+							<tr>
+								<th scope="row">모집인원</th>
+								<td id="vtrRecruitment">000 &#47; 000 명</td>
+							</tr>
+							<tr class="tr_line">
+								<th scope="row" colspan="2" class="tac">내용</th>
+							</tr>
+							<tr class="under">
+								<td colspan="2" class="tac" id="vtrContent">
+									<!-- <textarea id="vtrContent" readonly="readonly" style="height: 200px"></textarea> -->
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div><!-- // 20160302 -->
+			
+			<!-- 20160302 추가 -->
+			<div class="btn_half mt10" id="modiButton" style="display:none;">
+				<a href="#none" class="btn btnC_03 btn_full btn_f_06">
+					<span>취소</span>
+				</a>
+				<span class="btn btnC_04 btn_full btn_f_06">
+					<input type="button" id="modifyButton" value="수정" />
+				</span>
+			</div><!-- // 20160302 -->
+			
+			<div class="sns_send" id="smsButton" style="display:none;">
+				<textarea class="area_02" id="smsMsg" name="smsMsg"></textarea>
+				<span class="btn btnC_03 btn_full btn_f_05">
+					<input type="button" id="sendSmsButton" onclick="smsSend();" value="참여자에게 SMS보내기" />
+				</span>
+			</div>
+
+			<p class="resource_tit">자원봉사 신청하기</p>
+			<div class="tbl_type_02">
+	<form id="regForm">
+	<input type="hidden" class="txt" id="insertYN" name="insertYN" value="Y"/>
+	<input type="hidden"  id="page" name="page" value="1"/>
+	<input type="hidden"  id="scrollYN" name="scrollYN" value="N"/>
+				<table>
+					<caption>자원봉사 모집 표</caption>
+					<colgroup>
+						<col style="width:105px;" />
+						<col />
+					</colgroup>
+					<tbody>
+						<tr>
+							<th scope="row">이름</th>
+							<td><input type="text" class="txt" id="vtmMemberName" name="vtmMemberName" placeholder="이름을 입력하세요." readonly="readonly" />
+							<input type="hidden" class="txt" id="vtrNo" name="vtrNo"/>
+							<input type="hidden" class="txt" id="vtmMemberId" name="vtmMemberId"/>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">휴대폰</th>
+							<td><input type="text" class="txt" id="vtmHpNo" name="vtmHpNo" placeholder="휴대폰번호를 입력하세요." /></td>
+						</tr>
+						<tr>
+							<th scope="row">참여이유</th>
+							<td><textarea class="area_01" id="vtmReason" name="vtmReason" placeholder="자원봉사에 참여하게 된 이유나 계기를 간단하게 작성해 주세요." maxlength="500"></textarea></td>
+						</tr>
+					</tbody>
+				</table>
+	</form>
+			</div>
+			<span class="btn btnC_04 btn_full btn_f_05">
+				<input type="button" onclick="insertVolunteerMan();" value="자원봉사 참여하기" />
+			</span>
+			
+			<div id="memCodeCheck" style="display: none;">
+			<p class="tbl_tit">자원봉사에 참여한 인원<span id="howMany"></span></p>
+			<div class="tbl_type_03">
+				<table>
+					<caption>자원봉사에 참여한 인원 표</caption>
+					<colgroup>
+						<col style="width:15%;" />
+						<col style="width:25%" />
+						<col />
+					</colgroup>
+					<tbody id="tListBody">
+						<!-- <tr>
+							<td>홍길동동</td>
+							<td>010-1234-5678</td>
+							<td>
+								<div class="cancel">
+									자원봉사에 참여하고 싶습니다.
+									<a href="#none" class="btn btnC_05 btn_p_04">
+										<span>취소</span>
+									</a>
+								</div>
+							</td>
+						</tr> -->
+						
+					</tbody>
+				</table>
+			</div>
+			
+			
+			<div id="dummy" style="display:none">
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

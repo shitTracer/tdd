@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript">
+	function feelBtn(){
+		var feel_cts = $(".feel_wrap");
+		
+		feel_cts.each(function(){
+			var btn = $(this).children('.feel_btn');
+			var view = $(this).children('.feel_view');
+
+			btn.parent().toggleClass('on');
+			if(btn.parent().hasClass('on')){
+				view.fadeIn();
+			}else{
+				view.fadeOut();
+			}
+		})
+	}
+</script>
+</head>
+<body>
+<div id="wrap">
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+	<div class="pop_layer pop_p02">
+		<div class="pop_container">
+			<ul>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaotalk.png" alt="카카오톡" /></span> 카카오톡</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaostory.png" alt="카카오스토리" /></span>카카오스토리</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/band.png" alt="네이버밴드" /></span>네이버 밴드</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/facebook.png" alt="페이스북" /></span>페이스북</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/twitter.png" alt="트위터" /></span>트위터</a></li>
+			</ul>
+		</div>
+	</div><!-- // pop_up -->
+
+	<!-- header -->
+	<div id="header">
+		<div class="header_wrap">
+			<h1 class="logo"><a href="#none"><img src="../img/common/logo.png" alt="더불어민주당 메인페이지 가기" /></a></h1>
+			<a href="#none" class="total_search">통합검색</a>
+		</div>
+		<div class="gnb">
+			<ul>
+				<li class="on"><a href="#none">뉴스피드</a></li>
+				<li><a href="#none">더톡</a></li>
+				<li><a href="#none">자원봉사</a></li>
+				<li><a href="#none">더보기</a></li>
+			</ul>
+		</div>
+		<div class="gnb_sub">
+			<ul>
+				<li class="on"><a href="#none">브리핑</a></li>
+				<li><a href="#none">설문조사</a></li>
+				<li><a href="#none">캠패인</a></li>
+				<!-- <li><a href="#none">서명(청원)</a></li> -->
+			</ul>
+		</div>
+	</div><!-- // header -->
+
+	<!-- container -->
+	<div id="container">
+		<!-- news_grp -->
+		<div class="news_grp">
+
+			<!-- news_list 반복 -->
+			<div class="news_list">
+				<div class="tit_grp">
+					<p class="div_value v1"><span class="hid">캠페인</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<a href="news/01.html" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 <span>더보기</span></a>
+				</div>
+				<!-- 노출되지 않을땐 list_count 자체가 안보이게 해주세요. -->
+				<div class="list_count">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="list_circlebtn">
+					<ul>
+						<li class="feel_wrap">
+							<a href="#none" class="feel_btn" onclick="feelBtn()"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>
+							<ul class="feel_view">
+								<li><a href="#none"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+							</ul>
+						</li>
+						<li><a href="news/01.html"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>
+						<!-- <li><a href="#none" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon.png" alt="공유" /></a></li> -->
+					</ul>
+				</div>
+			</div>
+
+			
+			<div class="news_list">
+				<div class="tit_grp">
+					<p class="div_value v2"><span class="hid">서명</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<a href="#none" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 <span>더보기</span></a>
+				</div>
+				<div class="list_count">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="list_circlebtn">
+					<ul>
+						<li class="feel_wrap">
+							<a href="#none" class="feel_btn" onclick="feelBtn()"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>
+							<ul class="feel_view">
+								<li><a href="#none"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+							</ul>
+						</li>
+						<li><a href="#none"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>
+						<!-- <li><a href="#none" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon.png" alt="공유" /></a></li> -->
+					</ul>
+				</div>
+			</div>
+
+			<div class="news_list">
+				<div class="tit_grp">
+					<p class="div_value v3"><span class="hid">설문조사</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<a href="#none" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 <span>더보기</span></a>
+				</div>
+				<div class="list_count">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="list_circlebtn">
+					<ul>
+						<li class="feel_wrap">
+							<a href="#none" class="feel_btn" onclick="feelBtn()"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>
+							<ul class="feel_view">
+								<li><a href="#none"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+							</ul>
+						</li>
+						<li><a href="#none"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>
+						<!-- <li><a href="#none" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon.png" alt="공유" /></a></li> -->
+					</ul>
+				</div>
+			</div>
+
+			<div class="news_list">
+				<div class="tit_grp">
+					<p class="div_value v4"><span class="hid">서명</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<a href="#none" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 <span>더보기</span></a>
+				</div>
+				<div class="list_count">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="list_circlebtn">
+					<ul>
+						<li class="feel_wrap">
+							<a href="#none" class="feel_btn" onclick="feelBtn()"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>
+							<ul class="feel_view">
+								<li><a href="#none"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>
+								<li><a href="#none"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+							</ul>
+						</li>
+						<li><a href="#none"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>
+						<!-- <li><a href="#none" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon.png" alt="공유" /></a></li> -->
+					</ul>
+				</div>
+			</div>
+
+		</div><!-- // news_grp -->
+	</div><!-- // container -->
+</div>
+</body>
+</html>

@@ -1,0 +1,669 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0, user-scalable=yes, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<style type="text/css">
+   html{
+		-webkit-user-select: text;  /* Chrome all / Safari all */
+		  -moz-user-select: text;     /* Firefox all */
+		  -ms-user-select: text;      /* IE 10+ */
+		  user-select: text;
+   }
+</style>
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/common/common.js"></script>
+
+</head>
+
+<script type="text/javascript" charset="utf-8">
+
+//var v_serverUrl = "http://122.99.170.157:8080";
+//var v_serverUrl = "http://122.99.170.230/test";
+
+	var v_ScrollTopCount = 0;
+
+    	/**
+    	 * 닫기
+    	 **/
+    	function fnClose() {
+
+    			
+    		var memberId = getParameter('memberId');
+    		var memberCode = getParameter('memberCode');
+    		var trNo = getParameter('trNo');
+    		var roomOrnerId = getParameter('roomOrnerId');
+ 
+    	  
+    	  	if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+				
+    	  		fnClearInterval();
+    	  	
+    			window.conn.fnClose(memberId, trNo);
+    		} else { // 아이폰
+    			
+    		   		 $.ajax({
+    				        type: "POST",
+    				        url: serverUrl+"/talk/talkRoomOut.do",
+    				        data: {
+    				        	"memberId" 		: memberId
+    				        	, "trNo" 		: trNo
+    				        	, "roomOrnerId" 		: roomOrnerId
+    				        	, "msgState" 		: "2"
+    				        	
+    				        },
+    				        dataType: "json", 
+    				        success: function(res) {
+    				        	//alert(res.result);
+    			            	if(res.result=="success") {
+    			           	   		 $.ajax({
+    				     			        type: "POST",
+    				     			        url: serverUrl+"/talk/insertTalkMessage.do",
+    				     			        data: {
+    				     			        	"memberId" 		: memberId
+    				     			        	, "trNo" 		: trNo
+    				     			        	, "roomOrnerId" 		: roomOrnerId
+    				     			        	, "msgState" 		: "2"
+    				     			        	, "tContent" : encodeURIComponent("퇴장")
+    				     			        	
+    				     			        },
+    				     			        dataType: "json", 
+    				     			        success: function(res) {
+    				     			        	//alert(res.result);
+    				     		            	if(res.result=="success") {
+    				     		            		location.href = "./talkRoomList.html";
+    				     		            	}
+    				     			        }
+    				     			   });
+    			            		
+    			            	}
+    				        }
+    				   });
+    			
+    		}
+
+    	}
+    	
+    function fnChatList() {
+
+    	var values = []; 
+    	
+    	
+   		 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/talk/selectTalkChatList.do",
+		        data: {
+		        	"trNo" 		: $('#trNo').val()
+		        },
+		        dataType: "json", 
+		        success: function(res) {
+		        	//alert(res.result);
+	            	if(res.result=="success") {
+	            		//alert(res.orderInYn);
+
+                    	if(res.orderInYn == "Y") {
+                    		$('#roomOrner').html('<a href="#none" class="on">ON</a><a href="#none">OFF</a>');
+                    	} else {
+                    	
+                    		$('#roomOrner').html('<a href="#none">ON</a><a href="#none"  class="on">OFF</a>');
+                    	}		            		
+	            		
+	            		values = res.list;
+	            		
+	                    $.each(values, function( index, value ) {
+	                    	
+	                    	var memberCode = value.memberCode;
+	                    	var memberName = value.memberName;
+	                    	var tContent = value.tContent;
+	                    	var msgState = value.msgState;
+	                    	var inOutMsg = "";
+	                    	var tNo =  value.maxTNo;
+	                    	var regDate = value.regDate;
+
+	                    	
+	                    	if(msgState == "0") {
+	                    		if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+	                    			$('#chat01').append('<pre><p class="c_text"><strong>' + memberName + ' : </strong>' + tContent + '  ' + regDate + '</p></pre>');
+		                    	} else {
+		                    		$('#chat02').append('<pre><p class="c_text"><strong>' + memberName + ' : </strong>' + tContent + '  ' + regDate + '</p></pre>');
+		                    	}	
+	                    		
+	                    	} else {
+	                    		if(msgState == 1) {
+	                    			inOutMsg = "입장하였습니다.";
+	                    		} else {
+	                    			inOutMsg = "퇴장하였습니다.";
+	                    		}
+	                    		
+	                    		
+		                    	if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+		                    		//$('#chat01').append('<p class="entrance"><strong>' + memberName + '</strong>이 ' + inOutMsg + ' ' + value.regDate + '</p>');
+		                    	} else {
+		                    		//$('#chat02').append('<p class="entrance"><strong>' + memberName + '</strong>이  ' + inOutMsg + ' ' + value.regDate + '</p>');
+		                    	}                    			
+	                    	}
+	                    	
+	                    	$("#tNo").val(tNo);
+	                    	
+	                     });
+	            	}
+		        }
+		   }); 
+   		 
+   		fnSetScollTop();
+   		 
+    }
+    
+    function fnChatMemberList() {
+
+			var messageCount = 0;
+        	var values = []; 
+        	
+        	var v_tNo = $('#tNo').val() - 0;
+        	
+        	//alert($('#memberId').val());
+        	
+        	
+       		 $.ajax({
+    		        type: "POST",
+    		        url: serverUrl+"/talk/selectTalkChatTermList.do",
+    		        data: {
+    		        	"trNo" 		: $('#trNo').val()
+    		        	, "memberId" 		: $('#memberId').val()
+    		        	, "tNo" 		: v_tNo
+    		        },
+    		        dataType: "json", 
+    		        success: function(res) {
+    		        	//alert(res.result);
+    	            	if(res.result=="success") {
+    	            		//alert(res.result);
+    	            		values = res.list;
+    	            		
+    	                    $.each(values, function( index, value ) {
+    	                    	
+    	                    	var memberCode = value.memberCode;
+    	                    	var memberName = value.memberName;
+    	                    	var tContent = value.tContent;
+    	                    	var msgState = value.msgState;
+    	                    	var inOutMsg = "";
+    	                    	var tNo =  value.maxTNo;
+    	                    	var ornerInYn = value.ornerInYn;
+    	                    	var regDate = value.regDate;
+    	                    	
+    	                    	if(ornerInYn == "Y") {
+    	                    		//$('#roomOrner').remove();
+    	                    		//$('#roomOrner').append('<a href="#none" class="on">ON</a><a href="#none">OFF</a>');
+    	                    	} else {
+    	                    		
+    	                    		//$('#roomOrner').remove();
+    	                    		//$('#roomOrner').append('<a href="#none">ON</a><a href="#none"  class="on">OFF</a>');
+    	                    	}					
+    	                    	
+    	                    	var checkContent = $("#tContent").val();
+    	                    	
+    	                    	if(msgState == "0") {
+    	                    		if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+    	                    			$('#chat01').append('<pre><p class="c_text"><strong>' + memberName + ' : </strong>' + tContent + '  ' + regDate + '</p></pre>');
+    		                    	} else {
+    		                    		$('#chat02').append('<pre><p class="c_text"><strong>' + memberName + ' : </strong>' + tContent + '  ' + regDate + '</p></pre>');	    	                   
+    		                    	}	
+    	                    		
+	    	              			if(checkContent == "") {
+	    	              				fnSetScollTop();
+	    	              			}
+    	                    		
+    	                    	} else {
+    	                    		if(msgState == 1) {
+    	                    			inOutMsg = "입장하였습니다.";
+    	                    		} else {
+    	                    			inOutMsg = "퇴장하였습니다.";
+    	                    		}
+    	                    		
+    		                    	if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+    		                    		//$('#chat01').append('<p class="entrance"><strong>' + memberName + '</strong>이 ' + inOutMsg + ' ' + value.regDate + '</p>');
+    		                    	} else {
+    		                    		//$('#chat02').append('<p class="entrance"><strong>' + memberName + '</strong>이  ' + inOutMsg + ' ' + value.regDate + '</p>');
+    		                    	}                    			
+    	                    	}
+    	                    	
+    	                    	$("#tNo").val(tNo);
+    	                    	
+    	                    	messageCount++;
+    	                    	
+
+    	                    	
+    	                     });
+    	            	}
+    		        }
+    		   }); 
+       		 
+	       		 if(messageCount > 0) {
+	       			fnSetScollTop();
+	       		 }
+       		 
+      			
+
+
+        }
+    
+    function fnSubmit() {
+
+
+    	var trNo =  $("#trNo").val();
+		var memberId = $("#memberId").val();
+    	var memberCode = $("#memberCode").val();
+    	var memberName = $("#memberName").val();
+    	var tContent =  $("#tContent").val();
+    	var msgState = "0";
+    	
+		
+  		 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/talk/insertTalkMessageChat.do",
+		        data: {
+		        	"trNo" 		: trNo
+		        	, "memberId" 		: memberId
+		        	, "tContent" 		: tContent
+		        	, "msgState" 		: msgState
+		        },
+		        dataType: "json", 
+		        success: function(res) {
+	            	if(res.result=="success") {
+	            		
+	            	    var urlPattern = /\b(?:https?):\/\/[a-z0-9-+&@#\/%?=~_|!:,.;]*/gim;
+
+	            	    var result = tContent.replace(urlPattern, function(url){
+	            	        return '<a href="'+url+'">'+url+'</a>';
+	            	    });
+
+	            		if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+	            			$('#chat01').append('<pre><p class="c_text me"><strong>' + memberName + ' : </strong>' + result + '</p></pre>');
+	                	} else {
+	                		$('#chat02').append('<pre><p class="c_text menormal"><strong>' + memberName + ' : </strong>' + result + '</p></pre>');
+	                	}	
+	            	
+	            	}
+		        }
+		   }); 
+  		 
+  		 $("#tContent").val("");
+  		fnSetScollTop();
+  		//document.getElementById("tContent").focus();
+    	 	if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+                  
+               } else {
+                  if(memberCode == "00" || memberCode == "01" ||memberCode == "02" || memberCode == "03") {
+                   location.href = '#div_chat';
+                  }
+               }
+
+    }
+    
+
+
+
+    
+    function fnSetRoomNo() {
+
+    		var memberId = getParameter('memberId');
+    		var memberCode = getParameter('memberCode');
+    		var trNo = getParameter('trNo');
+    		var memberName = getParameter('memberName');
+    		var roomMember = getParameter('roomMember');
+    		var roomOrnerName =  getParameter('roomOrnerName');
+    		
+    		$("#memberId").val(memberId);
+    		$("#memberCode").val(memberCode);
+    		$("#trNo").val(trNo);
+    		$("#memberName").val(memberName);
+    		$("#roomOrnerName").html(roomOrnerName);
+    		
+    		var tag = ' <em class="num">'+roomMember+'</em>';
+    		$("#roomOrnerName").append(tag);
+    		
+    		if(memberId == "") {
+    			alert("로그아웃되었습니다. 로그인 후 사용하세요.");
+    			fnClose();
+    		}
+    		
+			fnSetScollTop();
+    }
+    
+	function fnSetScollTop() {
+		var memberCode = getParameter('memberCode');
+		
+		//alert(11);
+		
+		if(memberCode == "04") {
+			//var container_sub = document.getElementById("container_sub");
+			//container_sub.scrollTop = container_sub.scrollHeight;
+	  		
+			var chat01Container = document.getElementById("chat01");
+			chat01Container.scrollTop = chat01Container.scrollHeight;
+			
+			var chat02Container = document.getElementById("chat02");
+			chat02Container.scrollTop = chat02Container.scrollHeight; 
+			
+			var chat03Container = document.getElementById("chat03");
+			chat03Container.scrollTop = chat03Container.scrollHeight; 
+			
+			location.href="#m_height";
+		} else {
+			var chat01Container = document.getElementById("chat01");
+			chat01Container.scrollTop = chat01Container.scrollHeight;
+			
+			var chat03Container = document.getElementById("chat03");
+			chat03Container.scrollTop = chat03Container.scrollHeight; 
+			location.href="#m_height";
+		}
+
+	}
+	
+	
+	function fnLimitText(obj) {
+		
+		var v_length = obj.value.length;
+		
+		if(v_length > 30) {
+			$("#tContent").val(obj.value.substring(0, 200));
+		}
+		
+	}
+
+	$( document ).ready(function() { 
+		
+		var memberId = getParameter('memberId');
+		var memberCode = getParameter('memberCode');
+		var trNo = getParameter('trNo');
+		var roomOrnerId = getParameter('roomOrnerId');
+		
+		fnSetChatMember();
+		
+		fnSetRoomNo();
+		
+		setTimeout(fnChatList(), 2000);
+		//fnChatList();
+		
+		vInterval = setInterval(function(){ fnChatMemberList() }, 3000);
+		
+		if( $("#memberId").val() == "") {
+			clearInterval(vInterval);
+		}
+		
+	  	if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+
+		} else { // 아이폰
+			
+	   		 $.ajax({
+			        type: "POST",
+			        url: serverUrl+"/talk/talkRoomIn.do",
+			        data: {
+			        	"memberId" 		: memberId
+			        	, "trNo" 		: trNo
+			        	, "roomOrnerId" 		: roomOrnerId
+			        	, "msgState" 		: "1"
+			        	
+			        },
+			        dataType: "json", 
+			        success: function(res) {
+			        	//alert(res.result);
+		            	if(res.result=="success") {
+		            			
+		           	   		 $.ajax({
+		     			        type: "POST",
+		     			        url: serverUrl+"/talk/insertTalkMessage.do",
+		     			        data: {
+		     			        	"memberId" 		: memberId
+		     			        	, "trNo" 		: trNo
+		     			        	, "roomOrnerId" 		: roomOrnerId
+		     			        	, "msgState" 		: "1"
+		     			        	, "tContent" : encodeURIComponent("입장")
+		     			        	
+		     			        },
+		     			        dataType: "json", 
+		     			        success: function(res) {
+		     			        	//alert(res.result);
+		     		            	if(res.result=="success") {
+
+		     		            	}
+		     			        }
+		     			   });
+		            	}
+			        }
+			   });
+		}
+		
+	
+	});
+
+	function fnClearInterval() {
+		clearInterval(vInterval);
+	}
+	
+    function headerFocus(){
+        $("#header").css("position", "absolute");
+        $("#header").css("top", "0");
+        $("#header").css("left", "0");
+        $("#header").css("z-index", "1000");
+        $("#header").css("background", "#fff");
+        
+        if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+            
+        } else { // 아이폰
+            if( window.innerHeight == 548 ){ //iphone5
+                //alert('오나5');
+                $("#chatting_sbmit").css("position", "absolute");
+                $("#chatting_sbmit").css("bottom", "-7%");
+
+            }
+            if( window.innerHeight == 460 ){ //iphone4
+                //alert('오나4');
+                $("#chatting_sbmit").css("position", "absolute");
+                $("#chatting_sbmit").css("bottom", "-27%");
+                
+            }
+        }
+        
+        //top:0;left:0;width:100%;z-index:1000;background:#fff;
+    }
+    
+    function headerBlur(){
+        //alert('오나');
+
+        $("#header").css("position", "fixed");
+        
+        $("#header").css("top", "0");
+        $("#header").css("left", "0");
+        $("#header").css("z-index", "1000");
+        $("#header").css("background", "#fff");
+        
+        
+        if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+            
+        } else { // 아이폰
+            if( window.innerHeight == 548 ){ //iphone5
+                //alert('오나5');
+                $("#chatting_sbmit").css("position", "absolute");
+                $("#chatting_sbmit").css("bottom", "-7%");
+                
+            }
+            if( window.innerHeight == 460 ){ //iphone4
+                //alert('오나4');
+                $("#chatting_sbmit").css("position", "absolute");
+                $("#chatting_sbmit").css("bottom", "-27%");
+                
+            }
+        }
+    }
+    
+    $(function () {
+      adWrapper = $('#header');
+      
+      $(document).on('focusin', 'input, textarea', function() {
+                     adWrapper.addClass('ios_fixed');
+                     })
+      .on('focusout', 'input, textarea', function () {
+          adWrapper.removeClass('ios_fixed');
+          });
+      });
+    
+    
+    function fnSetChatMember() {
+    	
+		var memberId = getParameter('memberId');
+		var memberCode = getParameter('memberCode');
+		var trNo = getParameter('trNo');
+		var roomOrnerId = getParameter('roomOrnerId');
+		
+  		 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/talk/selectChatMemberYn.do",
+		        data: {
+		        	"memberId" 		: memberId
+		        	, "trNo" 		: trNo
+		        	
+		        },
+		        dataType: "json", 
+		        success: function(res) {
+		        	//alert(res.chatMeberCountYn);
+	            	if(res.result=="success") {
+            			var chatMeberCountYn = res.chatMeberCountYn;
+            			//alert(chatMeberCountYn);
+            			if(chatMeberCountYn == 'N') {
+	   	           	   		 $.ajax({
+	 	     			        type: "POST",
+	 	     			        url: serverUrl+"/talk/insertChatRoomMember.do",
+	 	     			        data: {
+	 	     			        	"memberId" 		: memberId
+	 	     			        	, "trNo" 		: trNo
+	 	     			        	
+	 	     			        },
+	 	     			        dataType: "json", 
+	 	     			        success: function(res) {
+	 	     			        	//alert(res.result);
+	 	     		            	if(res.result=="success") {
+	 	     		            		$("input:radio[name='pushYn']:radio[value='N']").attr("checked",true);
+	 	     		            	}
+	 	     			        }
+	 	     			   });
+            				
+            			} else {
+	   	           	   		 $.ajax({
+		 	     			        type: "POST",
+		 	     			        url: serverUrl+"/talk/selectTalkMemberPushYn.do",
+		 	     			        data: {
+		 	     			        	"memberId" 		: memberId
+		 	     			        	, "trNo" 		: trNo
+		 	     			        	
+		 	     			        },
+		 	     			        dataType: "json", 
+		 	     			        success: function(res) {
+		 	     			        	//alert(res.result);
+		 	     			        	//alert(res.pushYn);
+		 	     		            	if(res.result=="success") {
+		 	     		            		var pushYn = res.pushYn;
+		 	     		            		
+		 	     		            		//alert(pushYn);
+		 	     		            		if(pushYn == 'Y') {
+		 	     		            			$("input:radio[name='pushYn']:radio[value='Y']").attr("checked",true);
+		 	     		            		} else {
+		 	     		            			$("input:radio[name='pushYn']:radio[value='N']").attr("checked",true);
+		 	     		            		}
+		 	     		            	}
+		 	     			        }
+		 	     			   });
+            			}
+	            	}
+		        }
+		   });
+    }
+    
+    function fnPushYnChange() {
+    	
+		var memberId = getParameter('memberId');
+		var memberCode = getParameter('memberCode');
+		var trNo = getParameter('trNo');
+		var roomOrnerId = getParameter('roomOrnerId');
+		
+    	var pushYn = $(':radio[name="pushYn"]:checked').val();
+
+   		 $.ajax({
+	        type: "POST",
+	        url: serverUrl+"/talk/updateChatRoomPushYn.do",
+	        data: {
+	        	"memberId" 		: memberId
+	        	, "trNo" 		: trNo
+	        	, "pushYn" 		: pushYn
+	        	
+	        },
+	        dataType: "json", 
+	        success: function(res) {
+	        	//alert(res.result);
+            	if(res.result=="success") {
+
+            	}
+	        }
+	   });
+    	
+    }
+ </script>  
+<body>
+<input type="hidden" id="memberId" name="memberId" value="">
+<input type="hidden" id="memberCode" name="memberCode" value="">
+<input type="hidden" id="trNo" name="trNo" value="">
+<input type="hidden" id="memberName" name="memberName" value="">
+<input type="hidden" id="tNo" name="tNo" value="">
+
+<div id="wrap">
+	<div id="header" class="view h_c_02">
+		<div class="header_wrap ">
+			<p class="header_subj s2" id="roomOrnerName">홍길동 <em class="num">16</em></p>
+			<p class="radio_group push_btn2">
+					<input type="radio" id="push01" name="pushYn" value="Y" onChange="javascript:fnPushYnChange();"/>
+					<label for="push01">알림on</label>
+					&nbsp;
+					<input type="radio" id="push02" name="pushYn" value="N" onChange="javascript:fnPushYnChange();"/>
+					<label for="push02">알림off</label>
+			</p>
+						
+			<a href="javascript:fnClose();" class="complete_btn v2"><span>나가기</span></a>
+
+		</div>
+	</div>
+	<div id="container_sub">
+		<div id="chatting_grpTop" class="chatting_grp">
+
+			<div class="chatting_inner">
+			    <div id="div_chat"></div>
+
+				<div id="chat01" class="chatting_view">
+
+				</div>
+				
+				<div id="chat03"  class="chatting_area">
+					<div id="chat02" class="area_inner">
+					</div>
+
+				</div>
+
+				<div class="chatting_sbmit" id="chatting_sbmit">
+					<textarea id="tContent" name="tContent"  onKeyUp="return fnLimitText(this);" onFocus="javascript:headerFocus();" onBlur="javascript:headerBlur();"></textarea>
+					<span class="btn">
+						<input type="button" value="전송" onClick="javascript:fnSubmit();"/>
+					</span>
+				</div>
+				<div id="m_height"></div>
+			</div>
+		</div>
+	</div>
+	<div style="height:10px"></div>
+	
+</div>
+
+
+</body>
+</html>

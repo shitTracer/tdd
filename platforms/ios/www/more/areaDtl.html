@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        function siOnChange() {
+        	$("#sSiGunGu").empty();
+        	
+        	if('' ==  $("#sSiDo").val()){
+        		return;
+        	}
+        	
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSityGunGuList.do",
+  		        data: {"sSiDo": $("#sSiDo").val()},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		//console.log(res.resultData);
+  	            		 $.each(res.resultData, function() {
+  	                       
+  	                     $("<option value='" + this.sSiGunGu + "'>" + this.sSiGunGu + "</option>").appendTo("#sSiGunGu");
+  	                   });
+  	            	
+  		        }
+  		    }); 
+        	
+        	
+        }
+        
+
+		
+        function updateMember() {
+        	var memberId = window.localStorage.getItem("memberId");
+        	var sNo = 0;
+
+		
+        	sNo = $(":input:radio[name=rdo_01]:checked").val();
+        	
+        		if(sNo != null && typeof sNo !="undefined"){
+		         		 	$.ajax({
+					  		        type: "POST",
+					  		        url: serverUrl+"/tdd/member/updateMemberSNo.do",
+					  		        data: {"sNo": sNo,"memberId":memberId},
+					  		        dataType: "json", 
+					  		      	async: false,
+					  		        success: function(res) {
+
+					  		        	if(res.result == "S"){
+					  		        		navigatorAlert("수정되었습니다.");
+					  		        		window.localStorage.setItem("sNo",sNo);
+					  		        		window.location.href = "../more/profileMenu.html";
+					  		        	}else{
+					  		        		navigatorAlert("실패되었습니다.");
+					  		        	}
+					  		        	
+					  		        }
+					  		    }); 
+        		}else{
+        			navigatorAlert("선거구를 선택해주세요.");
+        		}
+       } 
+		
+    function selectSearch() {
+        	$("#tListBody").html("");
+        	$('#tbMain').hide();
+			$('#regBtn').hide();
+			
+        	$.ajax({
+		        type: "POST",
+		        url: serverUrl+"/tdd/more/selectSityDongSearchList.do",
+		        data: $("#searchForm").serialize(),
+		      	async: false,
+		        dataType: "json", 
+		        success: function(res) {
+					if(res.resultLeng > 0){
+						
+						$('#tbMain').show();
+						$('#regBtn').show();
+	  	            	$.each(res.resultData, function(i) {
+	  	            	
+	  	            		var str ="";
+	  	            		str +='<tr><td>'+this.sElectionDistrict+'</td><td>'+this.sDong+'</td><td>';
+	  	            		str +='<div class="rdo_grp"><span class="rdo_list on">';
+	  	            		str +='<input type="radio" class="radio" id="rdo_'+i+'" name="rdo_01" value="'+this.sNo+'" />';
+	  	            		str +='<label for="rdo_'+i+'"><span></span></label>';
+	  	            		str +='</span></div></td></tr>';
+	  	            		
+	  	            		$("#tListBody").append(str);
+	  	                    
+	  	                });
+					}else{
+						navigatorAlert("거주하고 계신 동을 정확히 입력해주세요.");
+						
+					}
+
+		        }
+		        
+		 		}); 
+        	
+        }
+        
+    	
+     $(function(){	
+     	//시도 셋팅
+     	$.ajax({
+		        type: "POST",
+		        url: serverUrl+"/tdd/volunteer/selectSitySidoList.do",
+		        data: {},
+		      	async: false,
+		        dataType: "json", 
+		        success: function(res) {
+	            	$.each(res.resultData, function() {
+	                     $("<option value='" + this.sSiDo + "'>" + this.sSiDo + "</option>").appendTo("#sSiDo");
+	                });
+		        }
+		    });
+        });
+ 
+
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">거주지</p>
+			<a href="javascript:;" class="complete_btn" onclick="updateMember();"><span>완료</span></a>
+			<a href="../more/profileMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+<form id="searchForm">
+<input type="hidden"  id="page" name="page" value="1"/>
+<input type="hidden"  id="initYN" name="initYN" value="Y"/>
+	<div id="container_sub">
+		<div class="profile_grp">
+			<div class="city_form">
+				<div class="select_wrap">
+					<div class="select_grp">    
+						<select name="sSiDo" id="sSiDo" onchange="siOnChange();">
+							<option value='' >선택</option>
+						</select>
+					</div>
+					<div class="select_grp">
+						<select name="sSiGunGu" id="sSiGunGu">
+							<option value='' >선택</option>
+						</select>
+					</div>
+				</div>
+				<div class="input_grp" style="display: none;">
+					<input type="text" class="txt place_01" placeholder="거주하고 계신 동을 정확히 입력해주세요." id="sDong" name="sDong" />
+				</div>
+				<a href="javascript:;" class="btn btn_full btn_f_02 btnC_01" onclick="selectSearch();">
+					<span>찾기</span>
+				</a>
+				<div class="tbl_type_01 mt10" id="tbMain" style="display: none;">
+					<table>
+						<caption>거주지 검색폼</caption>
+						<colgroup>
+							<col />
+							<col style="width:30%" />
+							<col style="width:15%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col">선거구</th>
+								<th scope="col">주소</th>
+								<th scope="col">선택</th>
+							</tr>
+						</thead>
+						<tbody id="tListBody">
+
+						</tbody>
+					</table>
+				</div>
+				<span class="btn btn_full btn_f_02 btnC_01" id="regBtn" style="display: none;">
+					<input type="button" value="지역등록" onclick="updateMember();" />
+				</span>
+			</div>
+		</div>
+	</div>
+	</form>
+</div>
+
+</body>
+</html>
+
+
+

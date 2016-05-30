@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript">
+var onDeviceReady = function() {
+
+}; 
+
+  function init() {
+      document.addEventListener("deviceready", onDeviceReady, false);
+      
+
+      window.localStorage.removeItem("memberName");
+      window.localStorage.removeItem("memberId");
+      window.localStorage.removeItem("memberCode");
+      window.localStorage.removeItem("birthday");
+      window.localStorage.removeItem("hpNo");
+  } 
+  
+  function choice1Click() {
+		window.localStorage.setItem("memberCode", "04");
+		
+		location.href='../member/joinMem.html';
+  }
+  
+  function choice2Click() {
+		window.localStorage.setItem("memberCode", "03");
+		
+		location.href='../member/joinPartyMem.html';
+  }
+</script>
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+	<div class="header_wrap">
+		<p class="header_subj">회원가입</p>
+		<a href="../member/login.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+	</div>
+	</div>
+	<div id="container_sub">
+		<div class="sign_intro">
+			<p class="sign_logo"><img src="../img/common/sign_bg_01.png" alt="더불어민주당" /></p>
+			<div class="sign_choice">
+				<a id="choice_01" class="choice_01" onclick="choice1Click();">일반인증 <span><img src="../img/icon/btm_icon_01.png" alt="" /></span></a>
+				<a id="choice_02" class="choice_02" onclick="choice2Click();">당원인증 <span><img src="../img/icon/btm_icon_02.png" alt="" /></span></a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<style type="text/css">
+   html{
+		-webkit-user-select: text;  /* Chrome all / Safari all */
+		  -moz-user-select: text;     /* Firefox all */
+		  -ms-user-select: text;      /* IE 10+ */
+		  user-select: text;
+   }
+</style>
+
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        function insert(){
+        	var memberId = window.localStorage.getItem("memberId");
+        	var cfbino = getParameter('cfbino');
+        	var cfbtitle = $('#title').val();
+        	var cfbcontent = $('#content').val();
+        	var cfbmovie = $('#cfbmovie').val();
+
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/insertCommunityArticle.do",
+      		        data: {
+      		        	"regid"		:	memberId
+      		        	,"cfbtitle"		: 	cfbtitle
+      		        	,"cfbcontent"	:	cfbcontent
+      		        	,"cfbmovie"	:	cfbmovie
+      		        	,"cfbino"	:	cfbino
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+      		        	if( res.status=="success" ){
+      		        		//window.localStorage.setItem("chulsuk", regDate);
+      		        		location.href = 'articleList.html?cfbino='+cfbino;
+      		        	}else{
+      		        		alert('작성 실패');
+      		        	}
+      		        }
+      		        
+      		    });
+
+        }
+        
+        $(document).ready(function(){
+        	var cfbino = getParameter('cfbino');
+            var backAddr = '../community/articleList.html?cfbino='+cfbino;
+            $('#detailBack').attr('href', backAddr);
+            $('#detailBack2').attr('href', backAddr);
+        });
+        </script>
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<!-- header -->
+	<div id="header" class="h_c_04">
+		<!-- <div class="header_wrap">
+			<h1 class="logo"><a href="#none"><img src="../img/common/logo.png" alt="더불어민주당 메인페이지 가기" /></a></h1>
+		</div>
+		<div class="gnb">
+			<ul>
+				<li><a href="../news/newsfeed.html?tnGubun=0">뉴스피드</a></li>
+				<li><a href="../talkRoom/talkRoomList.html">더톡</a></li>
+				<li class="on"><a href="../community/communityList.html">커뮤니티</a></li>
+				<li><a href="../volunteer/volunteerSearch.html">자원봉사</a></li>
+				<li><a href="../more/moreMenu.html"><img src="../img/icon/gnb_more.png" alt="더보기" /></a></li>
+			</ul>
+		</div> -->
+		<div class="header_wrap">
+			<p class="header_subj s2">커뮤니티</p>
+			<a href="#none" class="back_btn" id="detailBack"><span class="hid">뒤로가기</span></a>
+			<!-- <a href="#none" class="arw_btn" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon_02.png" alt="공유하기" /></a> -->
+		</div>
+	</div><!-- // header -->
+	<div id="container_sub">
+		<div class="community_grp">
+			<div class="community_write">
+				<span class="com_inp"><input type="text" class="txt" placeholder="제목을 입력하세요." name="title" id="title" maxlength="20"/></span>
+				<div class="textarea_grp">
+					<textarea placeholder="내용을 입력하세요." name="content" id="content"></textarea>
+				</div>
+				<!-- <div class="file_grp">
+					<input type="text" class="file_txt" id="fileName_01" readonly="readonly" placeholder="사진올리기" title="첨부된 파일경로" />
+					<span class="file_inner">
+						<a href="#none">
+							<label for="fill_add">파일찾기</label>
+							<input type="file" class="file_add" id="fill_add" onchange="javascript:document.getElementById('fileName_01').value=this.value" title="파일찾기" tabindex="-1" />
+						</a>
+					</span>
+				</div> -->
+				<div class="video_link">
+					<p><input type="text" class="txt" id="cfbmovie" placeholder="동영상 링크첨부" /></p>
+				</div>
+			</div>
+		</div>
+		<div class="btn_half mt10">
+			<a href="#none" id="detailBack2" class="btn btnC_03 btn_full btn_f_06">
+				<span>취소</span>
+			</a>
+			<span class="btn btnC_06 btn_full btn_f_06">
+				<input type="button" value="등록하기" onclick="insert();"/>
+			</span>
+		</div>
+	</div>
+</div>
+</body>
+</html>

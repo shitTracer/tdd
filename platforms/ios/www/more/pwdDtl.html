@@ -1,0 +1,96 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        
+     $(function(){	
+    	 var memberId = window.localStorage.getItem("memberId");
+    	 $("#memberId").text(memberId);
+    	 
+        });
+
+     function updateMember() {
+   	  if(!validatePwd($("#memberPwd").val(),$("#memberPwd2").val())){
+   			return;
+   		}
+   		
+   		var memberId = window.localStorage.getItem("memberId");
+   		if(confirm("수정 하시겠습니까?")) {
+		 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/tdd/member/updateMember.do",
+		        data: {"memberPwd": $("#memberPwd").val(),"memberId":memberId},
+		        dataType: "json", 
+		      	async: false,
+		        success: function(res) {
+	          		
+		        	
+		        	if(res.result == "S"){
+		        		navigatorAlert("수정되었습니다.");
+		        		
+		        		window.location.href = "../more/profileMenu.html";
+		        	}else{
+		        		navigatorAlert("실패되었습니다.");
+		        	}
+		        	
+		        }
+		    }); 
+   		}
+
+     }
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">비밀번호 변경</p>
+			<a href="javascript:;" onclick="updateMember();" class="complete_btn"><span>완료</span></a>
+			<a href="../more/profileMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="profile_grp">
+			<div class="profile_line">
+				<div class="inner">
+					<p class="profile_top" id="memberId" ></p>
+					<p class="profile_id">현재 비밀번호를 확인해 주세요.</p>
+				</div>
+			</div>
+			<div class="profile_line">
+				<div class="inner">
+					<input type="password" class="txt place_01" id="memberPwd" placeholder="비밀번호 영문,숫자 조합 8자 이상 입력하세요." maxlength="50" />
+				</div>
+				<br>
+				<div class="inner">
+					<input type="password" class="txt place_01" id="memberPwd2" placeholder="비밀번호 확인을 입력하세요." maxlength="50" />
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
+
+
+

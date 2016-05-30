@@ -1,0 +1,656 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=3.0, minimum-scale=1.0, user-scalable=yes, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<style type="text/css">
+   html{
+		-webkit-user-select: text;  /* Chrome all / Safari all */
+		  -moz-user-select: text;     /* Firefox all */
+		  -ms-user-select: text;      /* IE 10+ */
+		  user-select: text;
+   }
+</style>
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+            <script src="http://developers.kakao.com/sdk/js/kakao.min.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+      function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+      }
+        
+        function getNewsFeed(tnNo){
+
+        	var page = $('#page').val();
+        	var paged = $('#paged').val();
+        	var memberId = window.localStorage.getItem("memberId");
+
+        	if( page > paged ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/selectNewsFeedView_vote.do",
+      		        data: {
+      		        	"tnNo" 			: tnNo
+      		        	,"tnvMemberId"	: memberId
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+    						var listcount = 0;
+							var tnGubun = res.NewsFeedVO.tnGubun;
+							//상단 타이틀바
+							var hidValue = '';
+				        	if( tnGubun == '1'){
+				        		hidValue = '브리핑';
+				        	}else if( tnGubun == '2'){
+				        		hidValue = '자원봉사';
+				        	}else if( tnGubun == '3'){
+				        		hidValue = '캠페인';
+				        	}else if( tnGubun == '4'){
+				        		hidValue = '투표';
+				        	}else{
+				        		hidValue = '서명';
+				        	}
+				        	var vClass = 'v'+tnGubun;
+				        	$('#p_div_value').addClass(vClass);
+				        	$('#span_hid').html(hidValue)
+				        	var regDate = res.NewsFeedVO.regDate;
+				        	//regDate = regDate.substring(0,10);
+				        	var dateValue = hidValue +' &gt; ' + regDate;
+				        	
+				        	$('#p_tit').html(res.NewsFeedVO.tnTitle);
+				        	$('#p_date').html(dateValue);
+				        	$('#div_content').html(res.NewsFeedVO.tnContent);
+				        	var tnLikeCount = res.NewsFeedVO.tnLikeCount;
+				        	var tnHappyCount = res.NewsFeedVO.tnHappyCount;
+				        	var tnSadCount = res.NewsFeedVO.tnSadCount;
+				        	var emotionCount = parseInt(tnLikeCount) + parseInt(tnHappyCount) + parseInt(tnSadCount);
+				        	//$('#emotionCount').html(emotionCount);
+				        	 $('#tnLikeCount').html(tnLikeCount);
+	                         $('#tnHappyCount').html(tnHappyCount);
+	                         $('#tnSadCount').html(tnSadCount);
+				        	$('#replyCount').html(res.NewsFeedVO.replyCount);
+	                        $('#dummy').html(res.NewsFeedVO.tnContentDummy);
+							
+							var tnMainImage = res.NewsFeedVO.tnMainImage;
+							if( tnMainImage != '' && tnMainImage != null && tnMainImage != 'null' ){
+								var path = tnMainImage.substring(9, 17);
+					        	var imgsrc = serverUrl + '/utl/web/imageSrc.do?path=' + path + '&physical=' + tnMainImage + '&contentType=';
+					        	var tag = '<img src="'+imgsrc+'" alt="" />';
+					        	$('#div_img').append(tag);
+							}
+
+							var voted = res.voted;
+							if( voted == '1' || memberId == '' || memberId == null){
+								$('#news_rdo_1').css('display', 'block');
+								$('#news_rdo_0').css('display', 'none');
+								$('#votebutton').css('display', 'none');
+							}else{
+								$('#news_rdo_0').css('display', 'block');
+								$('#news_rdo_1').css('display', 'none');
+								$('#votebutton').css('display', 'block');
+							}
+							
+							var metatag = '';
+				            var url = shareUrl+'/share/newsfeedDetailVote.do?tnNo='+tnNo;
+
+	                           
+	                           var metaDesc = res.NewsFeedVO.tnContentDummy;
+	                           metaDesc = metaDesc.substring(0,50);
+	                           
+	                           metatag += '<meta property="og:url"           content="'+url+'" />';
+	                           metatag += '<meta property="og:type"          content="article" />';
+	                           metatag += '<meta property="og:title"         content="'+res.NewsFeedVO.tnTitle+'"/>" />';
+	                           metatag += '<meta property="og:description"   content="'+res.NewsFeedVO.tnContentDummy+'" />';
+	                           //metatag += '<meta property="og:image"         content="' + serverUrl + '/images/main_icon.png" />';
+	                           metatag += '<meta property="og:image"         content="' + serverUrl + '/images/main_icon.png" />';
+	                           $('head').append(metatag);
+							
+							$.each(res.itemList, function(index, list){
+    							var tnviNo = list.tnviNo;
+    							var tnNo = list.tnNo;
+    							var tnviDesc = list.tnviDesc;
+    							var tnviCount = list.tnviCount;
+    							$('#liList').append(makeRadioTag1(tnviNo,tnNo,tnviDesc,tnviCount, voted)); 
+    							$('#radioList').append(makeRadioTag0(tnviNo,tnNo,tnviDesc,tnviCount, voted)); 
+    						});
+							
+    						$.each(res.replyList, function(index, list){
+    							var tnrNo = list.tnrNo;
+    							var tnNo = list.tnNo;
+    							var tnrContent = list.tnrContent;
+    							var regId = list.regId;
+    							var regDate = list.regDate;
+    							var regIdMemberCode = list.regIdMemberCode;
+    							var regIdMemberName = list.regIdMemberName;
+
+    							$('#news_reply').append(makeNewsReplyTag(tnrNo,tnNo,tnrContent,regId,regDate,regIdMemberCode,regIdMemberName)); 
+    						});
+    					}else{
+    						alert('통신 오류');
+    					}
+      		        }
+      		    });
+        	}
+        }
+        
+       	function insertReply(){
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	var memberCode = window.localStorage.getItem("memberCode");
+			var tnNo = getParameter('tnNo');
+			var tnrContent = $('#tnrContent').val();
+			
+			if(memberId == '' || memberId == null || memberId == 'null'){
+				alert('로그인 하세요');
+				return;
+			}
+			
+			if( tnrContent.length > 200){
+				alert('200자 이하로 작성하세요.');
+				tnrContent = tnrContent.substring(0,200);
+				return;
+			}
+			
+       		if( confirm('댓글을 작성하시겠습니까?') == true ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/insertReply.do",
+      		        data: {
+      		        	"tnNo" 			: 	parseInt(tnNo)
+      		        	,"regId"		:	memberId
+      		        	,"tnrContent"	:	tnrContent
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+    						var now = new Date();
+    	            	    var year= now.getFullYear();
+    	            	    var mon = (now.getMonth()+1)>9 ? ''+(now.getMonth()+1) : '0'+(now.getMonth()+1);
+    	            	    var day = now.getDate()>9 ? ''+now.getDate() : '0'+now.getDate();
+    	            	              
+    	            	    var regDate = year + '-' + mon + '-' + day;
+    	            	    
+    	            	    $('#news_reply').append(makeNewsReplyTag(0,0,tnrContent,memberId,regDate,memberCode,memberName));
+    	            	    $('#tnrContent').val('');
+    	            	    //alert('작성하였습니다.');
+    					}else{
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('통신 오류');
+    						}
+    					}
+      	            	
+      		        }
+      		    });
+       		}
+       	}
+        
+        function makeNewsReplyTag(tnrNo,tnNo,tnrContent,regId,regDate,regIdMemberCode,regIdMemberName){
+        	
+        	regDate = regDate.substring(0,10);
+        	
+        	var tag = '';
+        	if( regIdMemberCode == '04' || regIdMemberCode == '' || regIdMemberCode == null){
+        		tag += '<div class="reply_list normal">';
+        	}else{
+	        	tag += '<div class="reply_list">';
+        	}
+        	
+        	tag += '<div class="reply_tit">';
+        	
+        	if( regIdMemberCode == '01'){
+	        	tag += '<p class="level v2"></p>';
+        	}else if( regIdMemberCode == '02'){
+	        	tag += '<p class="level v1"></p>';
+        	}else if( regIdMemberCode == '03'){
+	        	tag += '<p class="level v3"></p>';
+        	}else{
+        		//대국민은태그 없음
+        	}
+        	
+       		tag += '<p class="name">'+regIdMemberName+'</p>';
+        	tag += '<p class="date">'+regDate+'</p>';
+        	tag += '</div>';
+        	tag += '<p class="reply_text">'+tnrContent+'</p>';
+        	tag += '</div>';
+        	return tag;
+        }
+        
+        function addNewsEmotionCount(tnGubun){
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	var memberCode = window.localStorage.getItem("memberCode");
+			var tnNo = getParameter('tnNo');
+			
+			if(memberId == '' || memberId == null || memberId == 'null'){
+				alert('로그인 하세요');
+				return;
+			}
+			
+       		if( confirm('공감하시겠습니까?') == true ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/addNewsEmotionCount.do",
+      		        data: {
+      		        	"tnNo" 			: 	parseInt(tnNo)
+      		        	,"memberId"		:	memberId
+      		        	,"tnGubun"		:	tnGubun
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+    						if( tnGubun == 1){
+   								var emotionCount = $('#tnLikeCount').text();
+   	    	            	    emotionCount = parseInt(emotionCount) + 1;
+   	    	            	    $('#tnLikeCount').html(emotionCount);
+       						}
+   							if( tnGubun == 2){
+   								var emotionCount = $('#tnHappyCount').text();
+   	    	            	    emotionCount = parseInt(emotionCount) + 1;
+   	    	            	    $('#tnHappyCount').html(emotionCount);
+   							}
+   							if( tnGubun == 3){
+   								var emotionCount = $('#tnSadCount').text();
+   	    	            	    emotionCount = parseInt(emotionCount) + 1;
+   	    	            	    $('#tnSadCount').html(emotionCount);
+   							}
+    						
+    	            	    //var emotionCount = $('#emotionCount').text();
+    	            	    //emotionCount = parseInt(emotionCount) + 1;
+    	            	    
+    	            	    //$('#emotionCount').html(emotionCount);
+    	            	    emotionToggle();
+    	            	    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('공감하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('공감하였습니다');
+    						}
+    					}else if( res.status=="duplicated" ){
+    						emotionToggle();
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('이미 공감하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('이미 공감하였습니다');
+    						}
+    					}else{
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('통신 오류');
+    						}
+    					}
+      	            	
+      		        }
+      		    });
+       		}
+       	}
+        
+        
+        function addVote(){
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	var memberCode = window.localStorage.getItem("memberCode");
+			var tnNo = getParameter('tnNo');
+			var tnviNo = $('input[name=rdo_01]:checked').val();
+
+			//alert(tnviNo);
+			
+			if(memberId == '' || memberId == null || memberId == 'null'){
+				alert('로그인 하세요');
+				return;
+			}
+			
+       		if( confirm('투표하시겠습니까?') == true ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/addVoteCount.do",
+      		        data: {
+      		        	"tnNo" 			: 	parseInt(tnNo)
+      		        	,"tnvMemberId"		:	memberId
+      		        	,"tnviNo"		:	tnviNo
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+    	            	    var voteCount = $('#vote_num_'+tnviNo).text();
+    	            	    voteCount = voteCount.substring(0, voteCount.length-1);
+    	            	    voteCount = parseInt(voteCount) + 1;
+    	            	    voteCount = voteCount + '명';
+    	            	    $('#vote_num_'+tnviNo).html(voteCount);
+    	            	    $('#vote_num_after_'+tnviNo).html(voteCount);
+    	            	    $('#news_rdo_1').css('display', 'block');
+							$('#news_rdo_0').css('display', 'none');
+							$('#votebutton').css('display', 'none');
+    	            	    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('투표하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('투표하였습니다');
+    						}
+    	            	    addRank('02', tnNo);
+
+    					}else if( res.status=="duplicated" ){
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('이미 투표하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('이미 투표하였습니다');
+    						}
+    					}else{
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('통신 오류');
+    						}
+    					}
+      	            	
+      		        }
+      		    });
+       		}
+       	}
+        function goNewsView(tnNo){
+        	location.href = 'newsView.html?tnNo='+tnNo;
+        }
+      	
+        function goNewsView_vote(tnNo){
+        	location.href = 'newsView_VoteA.html?tnNo='+tnNo;
+        }
+        
+		function emotionToggle(){
+        	
+        	if( $('#feel_view').hasClass('fade') ){
+        		$('#feel_view').removeClass('fade');
+            	$('#feel_view').fadeOut();
+        	}else{
+        		$('#feel_view').addClass('fade');
+            	$('#feel_view').fadeIn();
+        	}
+        }
+		
+		function makeRadioTag1(tnviNo,tnNo,tnviDesc,tnviCount, voted){
+			var tag = '';
+			tag += '<li>'+tnviDesc+'<span class="num" id="vote_num_after_'+tnviNo+'">'+tnviCount+' 명</span></li>';
+			return tag;
+		} 
+		
+		function makeRadioTag0(tnviNo,tnNo,tnviDesc,tnviCount, voted){
+			var tag = '';
+			tag += '<span class="rdo_list">';
+			tag += '<input type="radio" class="radio" id="rdo_'+tnviNo+'" name="rdo_01" value="'+tnviNo+'" />';
+			tag += '<label for="rdo_'+tnviNo+'"><span></span>'+tnviDesc+' <em class="num" id="vote_num_'+tnviNo+'">'+tnviCount+'명</em></label>';
+			tag += '</span>';
+			return tag;
+		} 
+		
+        $(document).ready(function(){
+        	 
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	$('#memberName').val(memberName);
+        	$('#memberId').val(memberId);
+        	var tnNo = getParameter('tnNo');
+        	var reply = getParameter('reply');
+        	if( reply == 1 ){
+        		location.href = '#tnrContent';
+        		//$('#tnrContent').focus();
+        	}
+        	
+        	getNewsFeed(tnNo);
+        });
+        
+        
+        function snsshare(snstype) {
+        	var tnNo = getParameter('tnNo');
+        	addRank('03', tnNo);
+
+            var url = shareUrl+'/share/newsfeedDetailVote.do?tnNo='+tnNo;
+            
+            /* var url = '';
+            if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+                url = androidUrl;
+            } else {
+                url = iphoneUrl;
+            } */
+            
+            var subject = $('#p_tit').text();
+            var content = $('#dummy').text();
+            try {
+					content = content.substring(0, 100)+"...";
+			} catch (e) {
+				console.log(e);
+			}
+            
+            if(snstype == 'facebook') {
+                url = 'http://www.facebook.com/share.php?u='+url+'&title='+subject;
+            } else if(snstype == 'twitter') {
+                url = 'http://twitter.com/intent/tweet?text='+encodeURIComponent(subject+"\n"+content)+ '&url=' + encodeURIComponent(url);
+            } else if('band') {
+                var url = "http://www.band.us/plugin/share?body="+encodeURIComponent(subject+"\n"+content)+" "+encodeURIComponent(url);
+            }
+            
+            //sns(offerid, snstype);
+            window.open(url, 'sns', 'width=580, height=580, menubar=no, status=no, toolbar=no');
+        }
+
+Kakao.init('fb47416198b476028f6831646558a892');
+
+function snsKakaoTalkShare()  {
+
+	var tnNo = getParameter('tnNo');
+    var url = shareUrl+'/share/newsfeedDetailVote.do?tnNo='+tnNo;
+    
+    addRank('03', tnNo);
+if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+//url = androidUrl;
+var dummy = $('#dummy').text();
+var kaurl = Kakao.Link.sendTalkLink({
+  label: $('#p_tit').text(),
+  webLink: {
+  text: dummy,
+  url: url
+  },
+  image: { // 80 * 80 이상
+  src: serverUrl +  '/images/main_icon.png',
+  width: '145',
+  height: '151'
+  }
+  }); 
+window.CallApp.fnCaCaoLink(kaurl);
+} else {
+//url = iphoneUrl;
+var dummy = $('#dummy').text();
+
+Kakao.Link.sendTalkLink1({
+  label: $('#p_tit').text(),
+  webLink: {
+  text: dummy,
+  url: url
+  },
+  image: { // 80 * 80 이상
+  src: serverUrl +  '/images/main_icon.png',
+  width: '145',
+  height: '151'
+  }
+  }); 
+}
+
+}
+
+function snsKakaoStoryShare() {
+
+//var url = '';
+var tnNo = getParameter('tnNo');
+addRank('03', tnNo);
+
+var url = shareUrl+'/share/newsfeedDetailVote.do?tnNo='+tnNo;
+var dummy = $('#dummy').text();
+try {
+	dummy = dummy.substring(0, 100)+"...";
+} catch (e) {
+	console.log(e);
+}
+
+/* if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+url = androidUrl;
+} else {
+url = iphoneUrl;
+} */
+
+Kakao.Story.share({
+            url: url ,
+            text: dummy
+            });
+}
+
+function addRank(gubun, key){
+ 	var memberId = window.localStorage.getItem("memberId");
+
+	 $.ajax({
+	        type: "POST",
+	        url: serverUrl+"/addRank.do",
+	        data: {
+	        	"memberid"		:	memberId
+	        	,"rkgubun"		: 	gubun
+	        	,"rkboardkey"	:	key
+	        },
+	      	async: false,
+	        dataType: "json", 
+	        success: function(res) {
+	        	if( res.status=="success" ){
+	        		
+	        	}else{
+	        		
+	        	}
+	        }
+	    });
+ }
+        </script>
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+	<div class="pop_layer pop_p02">
+		<div class="pop_container">
+			<ul>
+				<li><a href="javascript:snsKakaoTalkShare();"><span class="sns"><img src="../img/sns/kakaotalk.png" alt="카카오톡" /></span> 카카오톡</a></li>
+                <li><a href="javascript:snsKakaoStoryShare();"><span class="sns"><img src="../img/sns/kakaostory.png" alt="카카오스토리" /></span>카카오스토리</a></li>
+                <li><a href="javascript:snsshare('band')"><span class="sns"><img src="../img/sns/band.png" alt="네이버밴드" /></span>네이버 밴드</a></li>
+                <li><a href="javascript:snsshare('facebook')"><span class="sns"><img src="../img/sns/facebook.png" alt="페이스북" /></span>페이스북</a></li>
+                <li><a href="javascript:snsshare('twitter')"><span class="sns"><img src="../img/sns/twitter.png" alt="트위터" /></span>트위터</a></li>
+			</ul>
+		</div>
+	</div><!-- // pop_up -->
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj s2">뉴스피드</p>
+			<a href="../news/newsfeed.html?tnGubun=0" class="back_btn"><span class="hid">뒤로가기</span></a>
+			<a href="#none" class="arw_btn" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../img/icon/share_icon_02.png" alt="공유하기" /></a>
+		</div>
+	</div>
+	<div id="container_sub">
+	
+			<!-- hidden input -->
+			<input type="hidden" name="page" id="page" value="1">
+			<input type="hidden" name="paged" id="paged" value="0">
+			<!--// hidden input -->
+			
+		<!-- news_grp -->
+		<div class="news_grp">
+			<div class="news_view">
+				<div class="tit_grp">
+					<p id="p_div_value" class="div_value vvv"><span id="span_hid" class="hid"><!-- 구분값 1번 --></span></p>
+					<div class="inner">
+						<p id="p_tit" class="tit"><!-- 뉴스피드 제목을 노출합니다. --></p>
+						<p id="p_date" class="date"><!-- 브리핑 &gt; 2016년 2월5일 --></p>
+					</div>
+				</div>
+				<div id="div_content" class="news_conts">
+					<a href="#none" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론</a>
+				</div>
+				<div id="dummy" style="display:none">
+                </div>
+				<div id="div_img" class="list_pic">
+					<!-- <img src="../img/sample_img01.png" alt="" /> -->
+				</div>
+				<div class="news_rdo" id="news_rdo_1">
+					<ul id="liList">
+						<!-- <li>긍정적이다. <span class="num">0,000명</span></li>
+						<li>부정적이다. <span class="num">0,000명</span></li>
+						<li>잘 모르겠다. <span class="num">0,000명</span></li> -->
+					</ul>
+				</div>
+				<div class="news_rdo" id="news_rdo_0">
+					<div class="rdo_grp v2" id="radioList">
+						<!-- <span class="rdo_list on">
+							<input type="radio" class="radio" id="rdo_01" name="rdo_01" checked="checked" />
+							<label for="rdo_01"><span></span>긍정적이다. <em class="num">0,000명</em></label>
+						</span>
+						<span class="rdo_list">
+							<input type="radio" class="radio" id="rdo_02" name="rdo_01" />
+							<label for="rdo_02"><span></span>부정적이다. <em class="num">0,000명</em></label>
+						</span>
+						<span class="rdo_list">
+							<input type="radio" class="radio" id="rdo_03" name="rdo_01" />
+							<label for="rdo_03"><span></span>잘 모르겠다. <em class="num">0,000명</em></label>
+						</span> -->
+					</div>
+				</div>
+				<div id="votebutton">
+					<a href="javascript:addVote();" class="btn btnC_01 btn_f_03 btn_full">
+						<span>투표하기</span>
+					</a>
+				</div>
+				<div class="list_count">
+					<ul>
+						<!-- <li>느낌 <span id="emotionCount">0.000</span></li> -->
+                        <li>좋아요 <span id="tnLikeCount">0.000</span></li>
+                        <li>힘내요 <span id="tnHappyCount">0.000</span></li>
+                        <li>슬퍼요 <span id="tnSadCount">0.000</span></li>
+						<li>댓글 <span id="replyCount">0.000</span></li>
+					</ul>
+				</div>
+				<div class="news_reply" id="news_reply">
+					<!-- <div class="reply_list">
+						<div class="reply_tit">
+							<p class="level v1"></p>
+							<p class="name">문재인</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div> -->
+				</div>
+				<div class="news_replybtn">
+					<div class="feel_wrap" id="feel_wrap">
+						<a href="#none" class="feel_icon feel_btn" onclick="emotionToggle()"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>
+						<ul class="feel_view" id="feel_view">
+							<li><a href="javascript:addNewsEmotionCount(1)"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>
+							<li><a href="javascript:addNewsEmotionCount(2)"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>
+							<li><a href="javascript:addNewsEmotionCount(3)"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+						</ul>
+					</div>					
+					<textarea id="tnrContent" placeholder="댓글을 달아주세요."></textarea>
+					<span class="btn reply_submit">
+						<input type="button" onClick="insertReply();" value="전송" />
+					</span>
+				</div>
+			</div>
+		</div><!-- // news_grp -->
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+<script type="text/javascript">
+var onDeviceReady = function() {
+
+	
+	
+	
+}; 
+
+function init() {
+      document.addEventListener("deviceready", onDeviceReady, false);
+      
+    var toDay = new Date();
+  	var year  = toDay.getFullYear();
+  	var month = (toDay.getMonth()+1);
+  	var day   = toDay.getDate();
+  	
+  	var str = "";
+  	year = year - 20;
+  	for (var i=year; i>=1900; i--) {
+  		
+  		if ("1980" == i) {
+  			str += "<option value='" + i + "' selected='selected'>" + i + "</option>";
+  		} else {
+  			str += "<option value='" + i + "' >" + i + "</option>";
+  		}
+  	}
+  	$("#year").html(str);
+  	
+  	
+  	for (var i=1; i<=31; i++) {
+  		var val = "";
+  		if (i < 10) {
+  			val = "0" + new String(i);
+  		} else {
+  			val = new String(i);
+  		} 
+  			
+  		
+  		if ("01" == i) {
+  			
+  			$("<option value='" + val + "' selected>" + val + "</option>").appendTo("#day");
+  		} else {
+  			$("<option value='" + val + "'>" + val + "</option>").appendTo("#day");
+  		}
+  		
+  		if (i < 13) {
+  			if ("01" == i) {
+  				$("<option value='" + val + "' selected>" + val + "</option>").appendTo("#month");
+  			} else {
+  				$("<option value='" + val + "'>" + val + "</option>").appendTo("#month");
+  			}
+  		}
+  		
+  	}
+}
+ 
+function next() {
+	  
+	  
+	if($('#memberName').val() == ""){
+		navigatorAlert("이름을 입력 해주세요.");
+		$('#memberName').focus();
+		return;
+	}
+	
+
+// 	if(!validateEmail($("#memberId").val())){
+// 		return;
+// 	}
+	
+ 	if($('#tel2').val().length < 3){
+ 		navigatorAlert("핸드폰 번호를 입력해주세요.");
+		$('#tel2').focus();
+		return;
+	}
+	
+	if($('#tel3').val().length < 4){
+		navigatorAlert("핸드폰 번호를 입력해주세요.");
+		$('#tel3').focus();
+		return;
+	}
+
+	
+	
+        		
+        	 	window.localStorage.setItem("memberName", $('#memberName').val());
+//         	 	window.localStorage.setItem("memberId", $('#memberId').val());
+        	 	
+        	 	window.localStorage.setItem("birthday", $('#year').val()+$('#month').val()+$('#day').val());
+        		window.localStorage.setItem("hpNo", $('#tel1').val()+$('#tel2').val()+$('#tel3').val());
+        		
+        		location.replace("../member/joinMem.html");
+        		
+	 	
+}
+
+  
+</script>
+</head>
+ <body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view h_c_02">
+	<div id="header" class="header_wrap">
+		<p class="header_subj">당원인증</p>
+		<a href="../member/joinSelect.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+	</div>
+	</div>
+	<div id="container_sub">
+		<div class="sign_grp">
+			<div class="sign_inp">
+				<div class="inner">
+					<p class="tit">이름</p>
+					<input type="text" class="txt" id="memberName" name="memberName"  placeholder="이름을 입력하세요."  maxlength="20"/>
+				</div>
+			</div>
+			<div class="sign_inp">
+				<div class="inner">
+					<p class="tit">생년월일</p>
+					<div class="select_grp_02">
+						<select name="year" id="year" class="w75">
+
+						</select>
+						<span>년</span>
+					</div>
+					<div class="select_grp_02">
+						<select name="month" id="month" class="w50">
+						</select>
+						<span>월</span>
+					</div>
+					<div class="select_grp_02">
+						<select name="day" id="day" class="w50">
+						</select>
+						<span>일</span>
+					</div>
+				</div>
+			</div>
+<!-- 			<div class="sign_inp"> -->
+<!-- 				<div class="inner"> -->
+<!-- 					<p class="tit">이메일</p> -->
+<!-- 					<input type="email" id="memberId" name="memberId"  class="txt" placeholder="이메일을 입력하세요." maxlength="100" /> -->
+<!-- 				</div> -->
+<!-- 				<span class="btn btn_full btnC_02 btn_f_02" style="margin-top: 30px"> -->
+<!-- 						<input type="button" value="인증받기" onclick="emailAuth();"/> -->
+<!-- 					</span> -->
+<!-- 			</div> -->
+			
+			<div class="sign_inp">
+				<div class="inner">
+					<p class="tit">휴대폰</p>
+					<div class="select_grp_02">
+						<select name="" id="tel1" class="w45">
+							<option value="010" selected="selected">010</option>
+							<option value="011">011</option>
+							<option value="016">016</option>
+							<option value="017">017</option>
+							<option value="018">018</option>
+							<option value="019">019</option>
+						</select>
+						<input type="tel" class="txt w65" id="tel2" onblur="this.value=this.value.replace(/[^0-9]/g,'')"  maxlength="4"/>
+						<input type="tel" class="txt w65" id="tel3"  onblur="this.value=this.value.replace(/[^0-9]/g,'')" maxlength="4" />
+					</div>
+				</div>
+			</div>
+
+			<div class="sign_btn">
+				<a href="../member/joinSelect.html" class="btn btn_full btnC_03 btn_f_02">
+					<span>취소</span>
+				</a>
+				<a onclick="next();" class="btn btn_full btnC_02 btn_f_02">
+					<span>확인</span>
+				</a>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

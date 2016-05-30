@@ -1,0 +1,337 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        
+     $(function(){	
+                
+
+        });
+
+     $(document).ready(function(){
+     	var memberId = window.localStorage.getItem("memberId");
+     	getRank();
+     	dataSetter(1);
+
+     });
+     
+     function getRank(){
+      	var memberId = window.localStorage.getItem("memberId");
+
+    	 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/selectRankList.do",
+		        data: {
+		        	"memberid" 			: 	memberId
+		        },
+		      	async: false,
+		        dataType: "json", 
+		        success: function(res) {
+					if( res.status=="success" ){
+						$.each(res.ranklist_chulsuk, function(index, list){
+							var score = list.rank;
+							var name = list.membername;
+							$('#ranklist_chulsuk'+index+'_name').val(name);
+							$('#ranklist_chulsuk'+index).val(score);
+						});
+						
+						$.each(res.ranklist_seolmun, function(index, list){
+							var score = list.rank;
+							var name = list.membername;
+							$('#ranklist_seolmun'+index+'_name').val(name);
+							$('#ranklist_seolmun'+index).val(score);
+						});
+
+						$.each(res.ranklist_gongyou, function(index, list){
+							var score = list.rank;
+							var name = list.membername;
+							$('#ranklist_gongyou'+index+'_name').val(name);
+							$('#ranklist_gongyou'+index).val(score);
+						});
+
+						var score_chulsuk = res.score_chulsuk;
+				    	var score_seolmun = res.score_seolmun;
+				    	var score_gongyou = res.score_gongyou;
+				    	
+				    	if( score_chulsuk == '' || score_chulsuk == 'null' || score_chulsuk == null){
+				    		 score_chulsuk = '0';
+				    	}
+				    	if( score_seolmun == '' || score_seolmun == 'null' || score_seolmun == null){
+				    		score_seolmun = '0';
+				    	}
+				    	if( score_gongyou == '' || score_gongyou == 'null' || score_gongyou == null){
+				    		score_gongyou = '0';
+				    	}
+
+				    	var rank_chulsuk = res.rank_chulsuk;
+				    	var rank_seolmun = res.rank_seolmun;
+				    	var rank_gongyou = res.rank_gongyou;
+				    	
+				    	if( rank_chulsuk == '' || rank_chulsuk == 'null' || rank_chulsuk == null){
+				    		 rank_chulsuk = '0';
+				    	}
+				    	if( rank_seolmun == '' || rank_seolmun == 'null' || rank_seolmun == null){
+				    		rank_seolmun = '0';
+				    	}
+				    	if( rank_gongyou == '' || rank_gongyou == 'null' || rank_gongyou == null){
+				    		rank_gongyou = '0';
+				    	}
+
+						$('#score_chulsuk').val(score_chulsuk);
+						$('#score_seolmun').val(score_seolmun);
+						$('#score_gongyou').val(score_gongyou);
+						
+						$('#rank_chulsuk').val(rank_chulsuk);
+						$('#rank_seolmun').val(rank_seolmun);
+						$('#rank_gongyou').val(rank_gongyou);
+					}else{
+						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+		                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+						}else{
+							alert('통신 장애');
+						}
+					}
+		        }
+		    });
+		}
+     
+     function dataSetter(gubun){
+    	 var score_chulsuk = $('#score_chulsuk').val();
+    	 var score_seolmun = $('#score_seolmun').val();
+    	 var score_gongyou = $('#score_gongyou').val();
+    	 
+    	 var rank_chulsuk = $('#rank_chulsuk').val();
+    	 var rank_seolmun = $('#rank_seolmun').val();
+    	 var rank_gongyou = $('#rank_gongyou').val();
+    	 
+    	 $('#span_chulsuk').html(score_chulsuk);
+    	 $('#span_seolmun').html(score_seolmun);
+    	 $('#span_gongyou').html(score_gongyou);
+    	 
+    	 $('#li_chulsuk').removeClass('on');
+    	 $('#li_seolmun').removeClass('on');
+    	 $('#li_gongyou').removeClass('on');
+    	 
+    	 var tag = '';
+    	 
+    	 var score0 = '';
+    	 var score1 = '';
+    	 var score2 = '';
+    	 var score3 = '';
+    	 var score4 = '';
+    	 
+    	 var name0 = '';
+    	 var name1 = '';
+    	 var name2 = '';
+    	 var name3 = '';
+    	 var name4 = '';
+    	 
+    	 if( gubun == 1 ){
+    		 $('#li_chulsuk').addClass('on');
+	    	 tag = '<strong>'+rank_chulsuk+'</string>';
+	    	 score0 = $('#ranklist_chulsuk0').val();
+	    	 score1 = $('#ranklist_chulsuk1').val();
+	    	 score2 = $('#ranklist_chulsuk2').val();
+	    	 score3 = $('#ranklist_chulsuk3').val();
+	    	 score4 = $('#ranklist_chulsuk4').val();
+	    	 
+	    	 name0 = $('#ranklist_chulsuk0_name').val();
+	    	 name1 = $('#ranklist_chulsuk1_name').val();
+	    	 name2 = $('#ranklist_chulsuk2_name').val();
+	    	 name3 = $('#ranklist_chulsuk3_name').val();
+	    	 name4 = $('#ranklist_chulsuk4_name').val();
+    	 }
+    	 if( gubun == 2 ){
+        	 $('#li_seolmun').addClass('on');
+	    	 tag = '<strong>'+rank_seolmun+'</string>';
+	    	 score0 = $('#ranklist_seolmun0').val();
+	    	 score1 = $('#ranklist_seolmun1').val();
+	    	 score2 = $('#ranklist_seolmun2').val();
+	    	 score3 = $('#ranklist_seolmun3').val();
+	    	 score4 = $('#ranklist_seolmun4').val();
+	    	 
+	    	 name0 = $('#ranklist_seolmun0_name').val();
+	    	 name1 = $('#ranklist_seolmun1_name').val();
+	    	 name2 = $('#ranklist_seolmun2_name').val();
+	    	 name3 = $('#ranklist_seolmun3_name').val();
+	    	 name4 = $('#ranklist_seolmun4_name').val();
+    	 }
+    	 if( gubun == 3 ){
+        	 $('#li_gongyou').addClass('on');
+	    	 tag = '<strong>'+rank_gongyou+'</string>';
+	    	 score0 = $('#ranklist_gongyou0').val();
+	    	 score1 = $('#ranklist_gongyou1').val();
+	    	 score2 = $('#ranklist_gongyou2').val();
+	    	 score3 = $('#ranklist_gongyou3').val();
+	    	 score4 = $('#ranklist_gongyou4').val();
+	    	 
+	    	 name0 = $('#ranklist_gongyou0_name').val();
+	    	 name1 = $('#ranklist_gongyou1_name').val();
+	    	 name2 = $('#ranklist_gongyou2_name').val();
+	    	 name3 = $('#ranklist_gongyou3_name').val();
+	    	 name4 = $('#ranklist_gongyou4_name').val();
+    	 }
+    	 
+    	 $('#myrank').html(tag);
+       	var memberName = window.localStorage.getItem("memberName");
+       	$('#membername').html(memberName);
+       	
+       	$('#rank0_name').html(name0);
+       	$('#rank1_name').html(name1);
+       	$('#rank2_name').html(name2);
+       	$('#rank3_name').html(name3);
+       	$('#rank4_name').html(name4);
+       	
+       	$('#rank0_score').html(score0);
+       	$('#rank1_score').html(score1);
+       	$('#rank2_score').html(score2);
+       	$('#rank3_score').html(score3);
+       	$('#rank4_score').html(score4);
+
+     }
+
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<input type="hidden" id="score_chulsuk" value="">
+<input type="hidden" id="score_seolmun" value="">
+<input type="hidden" id="score_gongyou" value="">
+
+<input type="hidden" id="rank_chulsuk" value="">
+<input type="hidden" id="rank_seolmun" value="">
+<input type="hidden" id="rank_gongyou" value="">
+
+<input type="hidden" id="ranklist_chulsuk0" value="">
+<input type="hidden" id="ranklist_chulsuk1" value="">
+<input type="hidden" id="ranklist_chulsuk2" value="">
+<input type="hidden" id="ranklist_chulsuk3" value="">
+<input type="hidden" id="ranklist_chulsuk4" value="">
+<input type="hidden" id="ranklist_chulsuk0_name" value="">
+<input type="hidden" id="ranklist_chulsuk1_name" value="">
+<input type="hidden" id="ranklist_chulsuk2_name" value="">
+<input type="hidden" id="ranklist_chulsuk3_name" value="">
+<input type="hidden" id="ranklist_chulsuk4_name" value="">
+
+<input type="hidden" id="ranklist_seolmun0" value="">
+<input type="hidden" id="ranklist_seolmun1" value="">
+<input type="hidden" id="ranklist_seolmun2" value="">
+<input type="hidden" id="ranklist_seolmun3" value="">
+<input type="hidden" id="ranklist_seolmun4" value="">
+<input type="hidden" id="ranklist_seolmun0_name" value="">
+<input type="hidden" id="ranklist_seolmun1_name" value="">
+<input type="hidden" id="ranklist_seolmun2_name" value="">
+<input type="hidden" id="ranklist_seolmun3_name" value="">
+<input type="hidden" id="ranklist_seolmun4_name" value="">
+
+<input type="hidden" id="ranklist_gongyou0" value="">
+<input type="hidden" id="ranklist_gongyou1" value="">
+<input type="hidden" id="ranklist_gongyou2" value="">
+<input type="hidden" id="ranklist_gongyou3" value="">
+<input type="hidden" id="ranklist_gongyou4" value="">
+<input type="hidden" id="ranklist_gongyou0_name" value="">
+<input type="hidden" id="ranklist_gongyou1_name" value="">
+<input type="hidden" id="ranklist_gongyou2_name" value="">
+<input type="hidden" id="ranklist_gongyou3_name" value="">
+<input type="hidden" id="ranklist_gongyou4_name" value="">
+
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">더당당 랭킹</p>
+			<a href="../more/moreMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<!-- ranking_grp -->
+		<div class="ranking_grp">
+			<div class="ranking_list">
+				<ul>
+					<li><a href="#none">출석수<span id="span_chulsuk">00,000</span></a></li>
+					<li><a href="#none">설문참여 수<span id="span_seolmun">00,000</span></a></li>
+					<li><a href="#none">공유 수<span id="span_gongyou">00,000</span></a></li>
+					<li><a href="#none"><span></span></a></li>
+				</ul>
+			</div>
+			<p class="ranking_current">
+				<span class="spanclass"></span><span id="membername"></span>님은 현재 <span id="myrank"></span>위 입니다.
+			</p>
+
+			<div class="ranking_view">
+				<p class="tit">전체랭킹</p>
+				<ul class="ranking_tab">
+					<li id="li_chulsuk" class="on"><a href="javascript:dataSetter(1);">출석왕</a></li>
+					<li id="li_seolmun"><a href="javascript:dataSetter(2);">설문왕</a></li>
+					<li id="li_gongyou"><a href="javascript:dataSetter(3);">공유왕</a></li>
+					<!-- <li><a href="04.html">캠페인왕</a></li> -->
+				</ul>
+
+				<div class="tbl_type_04">
+					<table>
+						<caption>출석왕,설문왕,자원봉사왕,캠페인왕 랭킹 표</caption>
+						<colgroup>
+							<col style="width:25%" />
+							<col style="width:50%" />
+							<col style="width:25%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col">순위</th>
+								<th scope="col">이름</th>
+								<th scope="col">점수</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td class="rank_num"><img src="../img/icon/best_icon.png" alt="베스트 1위" /></td>
+								<td id="rank0_name">김아무개</td>
+								<td id="rank0_score">00,000</td>
+							</tr>
+							<tr>
+								<td class="rank_num">2</td>
+								<td id="rank1_name">김아무개</td>
+								<td id="rank1_score">00,000</td>
+							</tr>
+							<tr>
+								<td class="rank_num">3</td>
+								<td id="rank2_name">김아무개</td>
+								<td id="rank2_score">00,000</td>
+							</tr>
+							<tr>
+								<td class="rank_num">4</td>
+								<td id="rank3_name">김아무개</td>
+								<td id="rank3_score">00,000</td>
+							</tr>
+							<tr>
+								<td class="rank_num">5</td>
+								<td id="rank4_name">김아무개</td>
+								<td id="rank4_score">00,000</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+		</div><!-- // ranking_grp -->
+
+	</div>
+</div>
+</body>
+</html>

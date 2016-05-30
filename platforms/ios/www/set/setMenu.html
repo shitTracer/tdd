@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        
+     $(function(){	
+                
+
+        });
+	function logout(){
+      	window.localStorage.clear();
+		location.href = "../member/login.html";
+	}
+	
+	function firedMember(){
+    	var memberId = window.localStorage.getItem("memberId");
+
+		if( confirm('정말 탈퇴하시겠습니까?') == true ){
+			$.ajax({
+		        type: "POST",
+		        url: serverUrl+"/fire.do",
+		        data: {
+		        	"memberId" 		: memberId
+		        },
+		        dataType: "json", 
+		        success: function(res) {
+	            	if(res.status=="success") {
+	            		navigatorAlert('탈퇴하였습니다.');
+	            		location.href = "../member/login.html";
+	            	}else{
+	            		navigatorAlert('통신 장애');
+	            	}
+		        }
+		   });
+		}
+	}
+	$(document).ready(function(){
+		versionCheck();
+
+	});
+
+	function versionCheck(){
+		var vgubun = '';
+		if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+			vgubun = 'A';
+	    } else {
+			vgubun = 'I';
+	    }
+		
+		$.ajax({
+		        type: "POST",
+		        url: serverUrl+"/version.do",
+		        data: {
+		        	"vgubun"		:	vgubun
+		        },
+		      	async: false,
+		        dataType: "json", 
+		        success: function(res) {
+		        	if( res.status=="success" ){
+		        		var version = res.version;
+		        		$('#version').html(version)
+		        	}else{
+		        		
+		        	}
+		        }
+		    });
+	}
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">설정</p>
+			<a href="../more/moreMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="set_grp">
+			<div class="set_list">
+				<p class="set_info">서비스 정보</p>
+				<a href="version.html" class="info_link">버전정보 <em id="version" class="confirm">1.0</em><span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="버전정보 수정" /></span></a>
+			</div>
+
+			<div class="set_list">
+				<p class="set_info">개인 정보</p>
+				<a href="signAgreement.html" class="info_link">서비스 이용 동의 <span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="서비스 이용 동의 상세보기" /></span></a>
+			</div>
+
+			<div class="set_list">
+				<p class="set_info">일반설정</p>
+				<a href="setAlert.html" class="info_link">알림설정<!--  <em class="confirm">소리와 진동</em><span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="알림설정 수정" /></span> --><span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="서비스 이용 동의 상세보기" /></a>
+				<!-- <a href="fontSize.html" class="info_link">글자크기 <em class="confirm">보통</em><span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="글자크기 수정" /></span></a> -->
+			</div>
+
+			<div class="set_list">
+				<p class="set_info">고객지원</p>
+				<a href="servicePolicy.html" class="info_link">약관 및 정책 <span class="link_more"><img src="../img/icon/more_arw_icon.png" alt="약관 및 정책 상세보기" /></span></a>
+			</div>
+			<div class="set_list">
+				<a href="javascript:logout();" class="info_link">로그아웃</a>
+				<a href="javascript:firedMember();" class="info_link">서비스 탈퇴</a>
+			</div>
+		</div>
+
+	</div>
+</div>
+</body>
+</html>

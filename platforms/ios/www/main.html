@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+        <title>더불어민주당</title>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+        <link rel="stylesheet" type="text/css" href="/css/base.css">
+            
+            <style type="text/css">
+                html{height:100%;}
+                </style>
+            
+            
+            <script type="text/javascript" src="/js/jquery-1.10.2.min.js"></script>
+            <script type="text/javascript" src="/js/common.js"></script>
+            <script type="text/javascript" src="/jquery/phonegap-1.4.1.js"></script>
+            <script type="text/javascript"  src="/js/common/common.js"></script>
+            <script type="text/javascript" charset="utf-8">
+                
+                var onDeviceReady = function() {
+                    
+                };
+            
+            function init() {
+                document.addEventListener("deviceready", onDeviceReady, false);
+            }
+            
+            
+            
+            $(function(){
+              enterReturnKey = function(e) {
+              if(e.keyCode==13 && e.srcElement.type != 'textarea') {
+              login();
+              }
+              };
+              
+              
+              var autoState = window.localStorage.getItem("autoState");
+              
+              if(autoState == "Y"){
+              location.replace('/news/newsfeed.html?tnGubun=0');
+              }else{
+              $('#intro_input').show();
+              $('#intro_btn').show();
+              
+              }
+              });
+              
+              //PUSH
+              function fnGcmRegister() {
+                  var memberId = window.localStorage.getItem('memberId');
+                  
+                  if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+                      window.CallApp.fnGCMRegister(memberId);
+                      
+                      location.replace('/news/newsfeed.html?tnGubun=0');
+                  } else { // 아이폰
+                      location.href = "toapp://fnGCMRegister?memberId=" + memberId;
+                  }
+                  
+                  
+              }
+            
+            function login() {
+                if($('#memberId').val() == ""){
+                    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+                        navigator.notification.alert("회원 아이디를 입력 해주세요.", alertCallback, "더당당", "확인");
+                    }else{
+                        alert("회원 아이디를 입력 해주세요.");
+                    }
+                    $('#memberId').focus();
+                    return;
+                }
+                
+                if($('#memberPwd').val() == ""){
+                    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+                        navigator.notification.alert("회원 비밀번호를 입력 해주세요.", alertCallback, "더당당", "확인");
+                    }else{
+                        alert("회원 비밀번호를 입력 해주세요.");
+                    }
+                    $('#memberPwd').focus();
+                    return;
+                }
+                $.ajax({
+                       type: "POST",
+                       url: serverUrl+"/tdd/member/login.do",
+                       data: {
+                       "memberId" 		: $('#memberId').val()
+                       ,"memberPwd" 		: $('#memberPwd').val()
+                       },
+                       dataType: "json",
+                       success: function(res) {
+                       if(res.result=="S") {
+                       
+                       window.localStorage.setItem("autoState", "Y");
+                       window.localStorage.setItem("memberId", $('#memberId').val());
+                       window.localStorage.setItem("memberName", res.resultData.memberName);
+                       window.localStorage.setItem("memberCode", res.resultData.memberCode);
+                       
+                       try {
+                       window.localStorage.setItem("birthday", res.resultData.birthday.replace(/(^\s*)|(\s*$)/gi, ""));
+                       } catch (e) {
+                       window.localStorage.setItem("birthday", "");
+                       }
+                       try {
+                       window.localStorage.setItem("hpNo", res.resultData.hpNo.replace(/(^\s*)|(\s*$)/gi, ""));
+                       } catch (e) {
+                       window.localStorage.setItem("hpNo", "");
+                       }
+                       try {
+                       window.localStorage.setItem("sex", res.resultData.sex.replace(/(^\s*)|(\s*$)/gi, ""));
+                       } catch (e) {
+                       window.localStorage.setItem("sex", "");
+                       }
+                       try {
+                       window.localStorage.setItem("sNo", res.resultData.sNo);
+                       } catch (e) {
+                       window.localStorage.setItem("sNo", 0);
+                       }
+                       
+                       
+                       
+                       
+                       fnGcmRegister();
+                       
+                       
+                       //location.replace('../news/newsfeed.html?tnGubun=0');
+                       
+                       }else if(res.result=="N") {
+                       if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+                       navigator.notification.alert('등록된 아이디가 아닙니다.', alertCallback, "더당당", "확인");
+                       }else{
+                       alert('등록된 아이디가 아닙니다.');
+                       }
+                       }else{
+                       if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+                       navigator.notification.alert('로그인에 실패 하였습니다.', alertCallback, "더당당", "확인");
+                       }else{
+                       alert('로그인에 실패 하였습니다.');
+                       }
+                       }
+                       }
+                       });
+            }
+            
+                </script>  
+            
+    </head>
+    <body onload="init();" id="stage" class="theme">
+        
+        <div class="intro_grp">
+            <div class="intro_tr">
+                <div class="intro_cell">
+                    <p class="intro_logo"><img src="/img/common/intro_logo.png" alt="더불어민주당" /></p>
+                    <div class="intro_login" id="intro_input" style="display: none;">
+                        <input type="email" class="txt"  id="memberId" name="memberId" title="이메일을 입력하세요." placeholder="이메일을 입력하세요."  maxlength="100"/>
+                        <input type="password" class="txt" id="memberPwd" name="memberPwd"  title="비밀번호를 입력하세요." placeholder="비밀번호를 입력하세요." maxlength="100"  />
+                    </div>
+                    <div class="btn_type_01" id="intro_btn"  style="display: none;">
+                        <a onclick="login();" class="btn btn_full btn_f_04 mb5">
+                            <span>로그인</span>
+                        </a>
+                        <a onclick="location.href='/member/joinMem.html';" class="btn btn_full btn_f_01">
+                            <span>회원가입</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </body>
+</html>
+
+
+

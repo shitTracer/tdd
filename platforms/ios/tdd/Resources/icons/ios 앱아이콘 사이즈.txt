@@ -1,0 +1,14 @@
+iphone: 57x57 Icon.png
+?iphone retina: 114x114 Icon@2x.png
+?ipad: 72x72 Icon-72.png
+?ipad retina: 144x144 Icon-72@2xpng
+?iphone spotlight: 29x29 Icon-small.png
+?iphone retina spotlight: 58x58 Icon-small@2x.png
+?ipad spotlight: 50x50 Icon-small-50.png
+?ipad retina spotlight: 100x100 Icon-small-50@2x.png
+?iphone ios7: 60x60 Icon-60.png
+?iphone retina ios7: 120x120 Icon-60@2x.png
+?ipad ios7: 76x76 Icon-60.png
+?ipad retina ios7: 152x152 Icon-60@2x.png
+?ios7 spotlight: 40x40 Icon-40.png
+?ios7 retina spotlight: 80x80 Icon-40@2x.png

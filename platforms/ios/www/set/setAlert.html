@@ -1,0 +1,135 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+	  var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        } 
+        
+        $(document).ready(function(){
+        	 getUserInfo();
+        });
+        
+        function check(){
+        	//alert($('#chk_01').attr('checked'));
+        	var checkValue = $("input:checkbox[name=chk_01]:checked").val();
+        	if( checkValue == 'Y'){
+        		
+        	}else{
+        		checkValue = 'N';
+        	}
+        	var memberId = window.localStorage.getItem("memberId");
+
+        	
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/member/updateMember.do",
+  		        data: {
+  		        	"pushYn" 			: 	checkValue
+  		        	,"memberId"		:	memberId
+  		        },
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+					if( res.result=="S" ){
+	            	    alert('변경되었습니다');
+	            	   	location.href = 'setMenu.html';
+					}else{
+						alert('통신 오류');
+					}
+  	            	
+  		        }
+  		    }); 
+        }
+        
+        function getUserInfo(){
+        	//alert($('#chk_01').attr('checked'));
+        	
+        	var memberId = window.localStorage.getItem("memberId");
+
+        	
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/getUserInfo.do",
+  		        data: {
+  		        	"memberId"		:	memberId
+  		        },
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+					if( res.status=="success" ){
+	            	    var pushYn = res.data.pushYn;
+	            	    if( pushYn == 'Y' ){
+	            	    	$("#chk_01").prop('checked', true);
+	            	    	$('#chk_01').attr('checked', true);
+	            	    }else{
+	            	    	$("#chk_01").prop('checked', false);
+	            	    	$('#chk_01').attr('checked', false);
+	            	    }
+					}else{
+						navigatorAlert('통신 오류');
+					}
+  	            	
+  		        }
+  		    }); 
+        }
+	  </script>
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">알림설정</p>
+			<a href="javascript:check();" class="complete_btn"><span>완료</span></a>
+			<a href="setMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="set_grp">
+			<div class="set_list">
+				<div class="check_grp v3">
+					<span class="check_list on">
+						<input type="checkbox" class="checkbox" id="chk_01" name="chk_01" value="Y"/>
+						<label for="chk_01">알림받기 <em class="lbl_bk">알림받기를 설정하시면 더당당에서 제공하는 다양한 콘텐츠를 푸시 알림으로 알려드립니다.</em><span></span></label>
+					</span>
+				</div>
+			</div>
+			<!-- <div class="set_list">
+				<p class="set_info v2">알림모드 설정</p>
+				<div class="rdo_grp v3">
+					<span class="rdo_list on">
+						<input type="radio" class="radio" id="rdo_01" name="rdo_01" checked="checked" />
+						<label for="rdo_01">소리와 진동<span></span></label>
+					</span>
+					<span class="rdo_list">
+						<input type="radio" class="radio" id="rdo_02" name="rdo_01" />
+						<label for="rdo_02">소리<span></span></label>
+					</span>
+					<span class="rdo_list">
+						<input type="radio" class="radio" id="rdo_03" name="rdo_01" />
+						<label for="rdo_03">진동<span></span></label>
+					</span>
+					<span class="rdo_list">
+						<input type="radio" class="radio" id="rdo_04" name="rdo_01" />
+						<label for="rdo_04">무음<span></span></label>
+					</span>
+				</div>
+			</div> -->
+		</div>
+	</div>
+</div>
+</body>
+</html>

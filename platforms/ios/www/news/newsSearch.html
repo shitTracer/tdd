@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<style type="text/css">
+   html{
+		-webkit-user-select: text;  /* Chrome all / Safari all */
+		  -moz-user-select: text;     /* Firefox all */
+		  -ms-user-select: text;      /* IE 10+ */
+		  user-select: text;
+   }
+</style>
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+	function goSearch(){
+		var search = $('#search').val();
+		location.href = '../news/newsSearchResult.html?search='+search;
+	} 
+ 
+ 
+        function goNewsView(tnNo){
+        	location.href = 'newsView.html?tnNo='+tnNo;
+        }
+      	
+        function goNewsView_vote(tnNo){
+        	location.href = 'newsView_VoteA.html?tnNo='+tnNo;
+        }
+        
+        $(document).ready(function(){
+        	 
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	$('#memberName').val(memberName);
+        	$('#memberId').val(memberId);
+        	
+        	//getNewsFeed(tnNo);
+        	
+        });
+        </script>
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap ">
+			<p class="header_subj">통합검색</p>
+			<a href="../news/newsfeed.html?tnGubun=0" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="all_search_grp">
+			<input type="text" class="txt" id="search" placeholder="검색어를 입력하세요." />
+			<span class="btn btnC_01 btn_p_03">
+				<input type="button" onclick="goSearch();" value="검색" />
+			</span>
+		</div>
+	</div>
+</div>
+</body>
+</html>

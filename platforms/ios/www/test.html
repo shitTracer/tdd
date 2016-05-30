@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta name="viewport" content="width=320; user-scalable=no" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+    <title>Minimal AppLaud App</title>
+
+	  <script type="text/javascript" charset="utf-8" src="phonegap-1.4.1.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+        var onDeviceReady = function() {
+            document.getElementById("devready").innerHTML = "OnDeviceReady fired.";
+        };
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, true);
+        }   
+</script> 
+
+		<script src="./jquery.mobile/jquery.mobile-1.1.0.js"></script>          
+        <script src="./jquery.mobile/jquery.mobile-1.1.0.min.js"></script>    
+ 
+<script>
+
+function test() {
+	$.ajax({
+	    type       : "POST",
+	    url        : "http://domain/public/login",
+	    crossDomain: true,
+	    beforeSend : function() {$.mobile.loading('show')},
+	    complete   : function() {$.mobile.loading('hide')},
+	    data       : {username : 'subin', password : 'passwordx'},
+	    dataType   : 'json',
+	    success    : function(response) {
+	        //console.error(JSON.stringify(response));
+	        alert('Works!');
+	    },
+	    error      : function() {
+	        //console.error("error");
+	        alert('Not working!');                  
+	    }
+	});
+}
+  
+</script>
+  </head>
+  <body onload="init();" id="stage" class="theme">
+    <h2>Minimal AppLaud App</h2>
+
+	<p>Your app goes here.</p>
+	<p>
+    <span id="devready">onDeviceReady not fired.</span>
+    </p>
+    
+     <a href="./index.html"> Home 페이지이동</a>
+
+  </body>
+</html>

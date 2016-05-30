@@ -1,0 +1,154 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../../css/base.css">
+<script type="text/javascript" src="../../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../../js/common.js"></script>
+<script type="text/javascript">
+	function feelBtn(){
+		var feel_cts = $(".feel_wrap");
+		
+		feel_cts.each(function(){
+			var btn = $(this).children('.feel_btn');
+			var view = $(this).children('.feel_view');
+
+			btn.parent().toggleClass('on');
+			if(btn.parent().hasClass('on')){
+				view.fadeIn();
+			}else{
+				view.fadeOut();
+			}
+		})
+	}
+</script>
+</head>
+<body>
+<div id="wrap">
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+	<div class="pop_layer pop_p02">
+		<div class="pop_container">
+			<ul>
+				<li><a href="#none"><span class="sns"><img src="../../img/sns/kakaotalk.png" alt="카카오톡" /></span> 카카오톡</a></li>
+				<li><a href="#none"><span class="sns"><img src="../../img/sns/kakaostory.png" alt="카카오스토리" /></span>카카오스토리</a></li>
+				<li><a href="#none"><span class="sns"><img src="../../img/sns/band.png" alt="네이버밴드" /></span>네이버 밴드</a></li>
+				<li><a href="#none"><span class="sns"><img src="../../img/sns/facebook.png" alt="페이스북" /></span>페이스북</a></li>
+				<li><a href="#none"><span class="sns"><img src="../../img/sns/twitter.png" alt="트위터" /></span>트위터</a></li>
+			</ul>
+		</div>
+	</div><!-- // pop_up -->
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj s2">뉴스피드</p>
+			<a href="01.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+			<!-- <a href="#none" class="arw_btn" onclick="toggleLayer($('.pop_p02'), 'on');"><img src="../../img/icon/share_icon_02.png" alt="공유하기" /></a> -->
+		</div>
+	</div>
+	<div id="container_sub">
+		<!-- news_grp -->
+		<div class="news_grp">
+			<div class="news_view">
+				<div class="tit_grp">
+					<p class="div_value v1"><span class="hid">구분값 1번</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<p class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론</p>
+				</div>
+				<div class="list_pic">
+					<img src="../../img/sample_img01.png" alt="" />
+				</div>
+				<div class="news_rdo">
+					<div class="rdo_grp v2">
+						<span class="rdo_list on">
+							<input type="radio" class="radio" id="rdo_01" name="rdo_01" checked="checked" />
+							<label for="rdo_01"><span></span>긍정적이다. <em class="num">0,000명</em></label>
+						</span>
+						<span class="rdo_list">
+							<input type="radio" class="radio" id="rdo_02" name="rdo_01" />
+							<label for="rdo_02"><span></span>부정적이다. <em class="num">0,000명</em></label>
+						</span>
+						<span class="rdo_list">
+							<input type="radio" class="radio" id="rdo_03" name="rdo_01" />
+							<label for="rdo_03"><span></span>잘 모르겠다. <em class="num">0,000명</em></label>
+						</span>
+					</div>
+				</div>
+				<a href="#none" class="btn btnC_01 btn_f_03 btn_full">
+					<span>투표하기</span>
+				</a>
+				<div class="list_count mt10">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="news_reply">
+					<div class="reply_list">
+						<div class="reply_tit">
+							<p class="level v1"></p>
+							<p class="name">문재인</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div>
+					<div class="reply_list">
+						<div class="reply_tit">
+							<p class="level v1"></p>
+							<p class="name">더벤저스</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div>
+					<div class="reply_list">
+						<div class="reply_tit">
+							<p class="level v2"></p>
+							<p class="name">의원</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div>
+					<div class="reply_list">
+						<div class="reply_tit">
+							<p class="level v3"></p>
+							<p class="name">당원</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div>
+					<!-- 대국민 유저 일 때 -->
+					<div class="reply_list normal">
+						<div class="reply_tit">
+							<p class="name">대국민 유저</p>
+							<p class="date">2016년 2월 5일 17:23</p>
+						</div>
+						<p class="reply_text">2016년 총선 승리로 보답하겠습니다.</p>
+					</div>
+				</div>
+				<div class="news_replybtn">
+					<div class="feel_wrap">
+						<a href="#none" class="feel_icon feel_btn" onclick="feelBtn()"><img src="../../img/icon/feel_icon.png" alt="느낌" /></a>
+						<ul class="feel_view">
+							<li><a href="#none"><img src="../../img/icon/circel_01.png" alt="좋아요" /></a></li>
+							<li><a href="#none"><img src="../../img/icon/circel_02.png" alt="힘내요" /></a></li>
+							<li><a href="#none"><img src="../../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+						</ul>
+					</div>
+					<textarea placeholder="댓글을 달아주세요."></textarea>
+					<span class="btn reply_submit">
+						<input type="submit" value="전송" />
+					</span>
+				</div>
+			</div>
+		</div><!-- // news_grp -->
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,108 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        function updateMember() {
+        	var memberId = window.localStorage.getItem("memberId");
+        	var sex = "N";
+//         	if(true == $("#rdo_01").is("checked")){
+//         		sex = $("#rdo_01").val();
+// 			}else if(true == $("#rdo_02").is("checked")){
+// 				sex = $("#rdo_02").val();
+// 			}else if(true == $("#rdo_03").is("checked")){
+// 				sex = $("#rdo_03").val();
+// 			}
+		
+				sex = $(":input:radio[name=rdo_01]:checked").val();
+      		 $.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/tdd/member/updateMember.do",
+      		        data: {"sex": sex,"memberId":memberId},
+      		        dataType: "json", 
+      		      	async: false,
+      		        success: function(res) {
+      	          		
+      		        	
+      		        	if(res.result == "S"){
+      		        		navigatorAlert("수정되었습니다.");
+      		        		window.localStorage.setItem("sex",sex);
+      		        		window.location.href = "../more/profileMenu.html";
+      		        	}else{
+      		        		navigatorAlert("실패되었습니다.");
+      		        	}
+      		        	
+      		        }
+      		    }); 
+     		
+
+       } 
+     $(function(){	
+    	 var sex = window.localStorage.getItem("sex");
+    	 if("M" == sex){
+    			$("#rdo_03").attr('checked', true);
+    		}else if("F" == sex){
+    			$("#rdo_02").attr('checked', true);
+    		}
+    	 
+    	 
+    	 
+        });
+
+
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">성별</p>
+			<a href="javascript:;" class="complete_btn" onclick="updateMember();"><span>완료</span></a>
+			<a href="../more/profileMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="profile_grp">
+			<div class="profile_line line2">
+				<div class="rdo_grp v3">
+					<span class="rdo_list on">
+						<input type="radio" class="radio" id="rdo_01" name="rdo_01" checked="checked" value="N"/>
+						<label for="rdo_01">선택안함<span></span></label>
+					</span>
+					<span class="rdo_list">
+						<input type="radio" class="radio" id="rdo_02" name="rdo_01" value="F" />
+						<label for="rdo_02">여성<span></span></label>
+					</span>
+					<span class="rdo_list">
+						<input type="radio" class="radio" id="rdo_03" name="rdo_01" value="M"/>
+						<label for="rdo_03">남성<span></span></label>
+					</span>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
+
+
+

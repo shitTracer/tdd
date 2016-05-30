@@ -1,0 +1,515 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=yes, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<style type="text/css">
+   html{
+		-webkit-user-select: text;  /* Chrome all / Safari all */
+		  -moz-user-select: text;     /* Firefox all */
+		  -ms-user-select: text;      /* IE 10+ */
+		  user-select: text;
+   }
+</style>
+
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        function siOnChange() {
+        	
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSityGunGuList.do",
+  		        data: {"sSiDo": $("#vtrSi").val()},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		//console.log(res.resultData);
+  	            		 $.each(res.resultData, function() {
+  	                       
+  	                     $("<option value='" + this.sSiGunGu + "'>" + this.sSiGunGu + "</option>").appendTo("#vtrGu");
+  	                   });
+  	            	
+  		        }
+  		    }); 
+        }
+        
+        function newsFeedList(tnGubunParam){
+        	var page = $('#page').val();
+        	var paged = $('#paged').val();
+        	
+        	if( page > paged ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/selectNewsFeedList.do",
+      		        data: {
+      		        	"page" 		: 	page
+      		        	,"tnGubun"	:	tnGubunParam
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+    						var listcount = 0;
+    						$.each(res.newsFeedList, function(index, list){
+    							listcount++;
+    							var tnNo = list.tnNo;
+    							var tnGubun = list.tnGubun;
+    							var tnTitle = list.tnTitle;
+    							var tnContentDummy = list.tnContentDummy;
+    							var tnViewCount = list.tnViewCount;
+    							var regDate = list.regDate;
+    							var tnMainImage = list.tnMainImage;
+    							var tnMovie = list.tnMovie;
+    							
+    							var replyCount = list.replyCount;
+    							var tnLikeCount = list.tnLikeCount;
+    							var tnHappyCount = list.tnHappyCount;
+    							var tnSadCount = list.tnSadCount;
+    							var emotionCount = parseInt(tnLikeCount) + parseInt(tnHappyCount) + parseInt(tnSadCount);
+    							//console.log(tnNo +':'+ tnGubun +':'+ tnTitle +':'+ tnContentDummy +':'+ tnViewCount +':'+ regDate);
+    							$('#newsfeed').append(makeNewsFeedTag(tnNo,tnGubun,tnTitle,tnContentDummy,tnViewCount,regDate,tnMainImage,replyCount,emotionCount,tnLikeCount,tnHappyCount,tnSadCount,tnMovie)) 
+    							
+    						});
+    						if( listcount == 0 ){
+    							/* alert('마지막 글입니다.'); */
+    						}
+    						$('#paged').val( $('#page').val() );
+    					}else{
+    						
+    						if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('통신 오류');
+    						}
+    					}
+      	            	
+      		        }
+      		    });
+        	}
+        }
+        
+        function addNewsEmotionCount(tnNo, tnGubun){
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	var memberCode = window.localStorage.getItem("memberCode");
+			//var tnNo = getParameter('tnNo');
+        	if(memberId == '' || memberId == null || memberId == 'null'){
+        		if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+              		navigator.notification.alert('로그인 하세요', alertCallback, "더당당", "확인");
+        		}else{
+              		alert('로그인 하세요');
+              	}
+				return;
+			}
+        	
+       		if( confirm('공감하시겠습니까?') == true ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/addNewsEmotionCount.do",
+      		        data: {
+      		        	"tnNo" 			: 	parseInt(tnNo)
+      		        	,"memberId"		:	memberId
+      		        	,"tnGubun"		:	tnGubun
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+    					if( res.status=="success" ){
+							if( tnGubun == 1){
+								var emotionCount = $('#tnLikeCount_'+tnNo).text();
+	    	            	    emotionCount = parseInt(emotionCount) + 1;
+	    	            	    $('#tnLikeCount_'+tnNo).html(emotionCount);
+    						}
+							if( tnGubun == 2){
+								var emotionCount = $('#tnHappyCount_'+tnNo).text();
+	    	            	    emotionCount = parseInt(emotionCount) + 1;
+	    	            	    $('#tnHappyCount_'+tnNo).html(emotionCount);
+							}
+							if( tnGubun == 3){
+								var emotionCount = $('#tnSadCount_'+tnNo).text();
+	    	            	    emotionCount = parseInt(emotionCount) + 1;
+	    	            	    $('#tnSadCount_'+tnNo).html(emotionCount);
+							}
+
+    	            	    //var emotionCount = $('#emotionCount_'+tnNo).text();
+    	            	    //emotionCount = parseInt(emotionCount) + 1;
+    	            	    
+    	            	    //$('#emotionCount_'+tnNo).html(emotionCount);
+    	            	    emotionToggle(tnNo);
+    	            	    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('공감하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('공감하였습니다');
+    						}
+    					}else if( res.status=="duplicated" ){
+    	            	    emotionToggle(tnNo);
+    	            	    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('이미 공감하였습니다', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('이미 공감하였습니다');
+    						}
+    					}else{
+    	            	    emotionToggle(tnNo);
+    	            	    if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {
+      	                		navigator.notification.alert('통신 오류', alertCallback, "더당당", "확인");
+    						}else{
+    							alert('통신 오류');
+    						}
+    					}
+      	            	
+      		        }
+      		    });
+       		}
+       	}
+        
+        function makeTit_grp(tnNo, tnGubun, tnTitle, regDate){
+        	//1:브리핑, 2:자원봉사, 3:캠페인, 4:투표
+        	var hidValue = '';
+        	if( tnGubun == '1'){
+        		hidValue = '브리핑';
+        	}else if( tnGubun == '2'){
+        		hidValue = '자원봉사';
+        	}else if( tnGubun == '3'){
+        		hidValue = '캠페인';
+        	}else if( tnGubun == '4'){
+        		hidValue = '투표';
+        	}else{
+        		hidValue = '서명';
+        	}
+        	//regDate = regDate.substring(0,10);
+        	
+        	var tag = '';
+        	if(tnGubun == '4'){
+            	tag += '<div class="tit_grp" onClick="goToViewVote('+tnNo+')">';
+    		}else{
+            	tag += '<div class="tit_grp" onClick="goToView('+tnNo+')">';
+    		}
+        	tag += '<p class="div_value v'+tnGubun+'"><span class="hid">'+hidValue+'</span></p>';
+           	tag += '<div class="inner">';
+            tag += '<p class="tit">'+tnTitle+'</p>';
+            tag += '<p class="date">'+hidValue+' &gt; '+regDate+'</p>';
+            tag += '</div>';
+            tag += '</div>';
+            return tag;
+        }
+        
+        function makeNews_conts(tnNo, tnGubun,tnContentDummy){
+        	if( tnContentDummy.length > 200 ){
+        		tnContentDummy = tnContentDummy.substring(0,200) +'...';
+        	}
+        	var tag = '<div class="news_conts">';
+        	
+        	if(tnGubun == '4'){
+        		tag += '<a href="javascript:goToViewVote('+tnNo+')" class="text">'+tnContentDummy+'</a>'
+    		}else{
+        		tag += '<a href="javascript:goToView('+tnNo+')" class="text">'+tnContentDummy+'</a>'
+    		}
+           		tag += '</div>';
+            return tag;
+        }
+        
+        function makeList_pic(tnNo, tnGubun,tnMainImage, tnMovie){
+        	
+        	var tag = '';
+        	if(tnGubun == '4'){
+            	tag += '<div class="list_pic" onClick="goToViewVote('+tnNo+')">';
+    		}else{
+            	tag += '<div class="list_pic" onClick="goToView('+tnNo+')">';
+    		}
+        	
+			if( tnMovie != '' && tnMovie != null && tnMovie != 'null' ){
+				tag += tnMovie;
+			}else{
+				var path = tnMainImage.substring(9, 17);
+	        	//alert(path);
+	        	
+	        	var src = serverUrl + '/utl/web/imageSrc.do?path=' + path + '&physical=' + tnMainImage + '&contentType=';
+	        	tag += '<img src="'+src+'" alt="" />';
+			}
+            tag += '</div>';
+            return tag;
+        }
+        
+        function makeList_count(tnNo, tnGubun,replyCount,emotionCount,tnLikeCount,tnHappyCount,tnSadCount){
+        	var tag = '';
+        	if(tnGubun == '4'){
+            	tag += '<div class="list_count" onClick="goToViewVote('+tnNo+')">';
+    		}else{
+            	tag += '<div class="list_count" onClick="goToView('+tnNo+')">';
+    		}
+           	tag += '<ul>';
+            //tag += '<li>느낌 <span id="emotionCount_'+tnNo+'">'+emotionCount+'</span></li>';
+            tag += '<li>좋아요 <span id="tnLikeCount_'+tnNo+'">'+tnLikeCount+'</span></li>';
+            tag += '<li>힘내요 <span id="tnHappyCount_'+tnNo+'">'+tnHappyCount+'</span></li>';
+            tag += '<li>슬퍼요 <span id="tnSadCount_'+tnNo+'">'+tnSadCount+'</span></li>';
+            tag += '<li>댓글 <span id="replyCount'+tnNo+'">'+replyCount+'</span></li>';
+            tag += '</ul>';
+            tag += '</div>';
+            return tag;
+        }
+        function makeList_circlebtn(tnNo, tnGubun){
+        	var tag = '<div class="list_circlebtn">';
+           	tag += '<ul>';
+           	tag += '<li class="feel_wrap" id="feel_wrap_'+tnNo+'">';
+           	tag += '<a href="javascript:emotionToggle('+tnNo+')" class="feel_btn"><img src="../img/icon/feel_icon.png" alt="느낌" /></a>';
+           	tag += '<ul class="feel_view" id="feel_view_'+tnNo+'">';
+           	tag += '<li><a href="javascript:addNewsEmotionCount('+tnNo+',1)"><img src="../img/icon/circel_01.png" alt="좋아요" /></a></li>';
+           	tag += '<li><a href="javascript:addNewsEmotionCount('+tnNo+',2)"><img src="../img/icon/circel_02.png" alt="힘내요" /></a></li>';
+           	tag += '<li><a href="javascript:addNewsEmotionCount('+tnNo+',3)"><img src="../img/icon/circel_03.png" alt="슬퍼요" /></a></li>';
+           	tag += '</ul>';
+           	tag += '</li>';
+           	if(tnGubun == '4'){
+	            tag += '<li><a href="../news/newsView_VoteA.html?reply=1&tnNo='+tnNo+'"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>';
+           	}else{
+	            tag += '<li><a href="../news/newsView.html?reply=1&tnNo='+tnNo+'"><img src="../img/icon/reply_icon.png" alt="댓글" /></a></li>';
+           	}
+            tag += '</ul>';
+            tag += '</div>';
+            return tag;
+        }
+        
+        function makeNewsFeedTag(tnNo,tnGubun,tnTitle,tnContentDummy,tnViewCount,regDate,tnMainImage,replyCount,emotionCount,tnLikeCount,tnHappyCount,tnSadCount,tnMovie){
+        	
+        	var news_list = $('<div></div>');
+        		news_list.addClass('news_list');
+        		
+        		news_list.append(makeTit_grp(tnNo, tnGubun, tnTitle, regDate));
+				news_list.append(makeNews_conts(tnNo, tnGubun,tnContentDummy));
+				if( tnMovie != '' && tnMovie != null && tnMovie != 'null' ){
+					news_list.append(makeList_pic(tnNo, tnGubun, tnMainImage, tnMovie));
+				}else if( tnMainImage != '' && tnMainImage != null && tnMainImage != 'null'){
+					news_list.append(makeList_pic(tnNo, tnGubun, tnMainImage, tnMovie));
+				}
+				news_list.append(makeList_count(tnNo, tnGubun, replyCount,emotionCount,tnLikeCount,tnHappyCount,tnSadCount));
+				news_list.append(makeList_circlebtn(tnNo, tnGubun));
+        	return news_list;
+        }
+      
+        
+        $(document).ready(function(){
+        	 
+        	var memberId = window.localStorage.getItem("memberId");
+        	
+        	if(memberId == '' || memberId == null || memberId == 'null'){
+        		location.href = '../member/login.html';
+        	}
+        	var memberName = window.localStorage.getItem("memberName");
+        	$('#memberName').val(memberName);
+        	$('#memberId').val(memberId);
+        	var tnGubunParam = getParameter('tnGubun');
+        	if( tnGubunParam == '1'){
+        		$('.liCheck').removeClass();
+        		$('#li1').addClass('on');
+        		
+        	}else if( tnGubunParam == '4'){
+        		$('.liCheck').removeClass();
+				$('#li2').addClass('on');
+        	}else if( tnGubunParam == '3'){
+        		$('.liCheck').removeClass();
+        		$('#li3').addClass('on');
+        	}
+        	
+        	if(tnGubunParam == '' || tnGubunParam == null){
+        		tnGubunParam = 0;
+        	}
+        	loginCheck();
+        	chulsuk();
+        	newsFeedList(tnGubunParam);
+        	$(function(){
+        		   $(window).scroll(function(){
+        		       if($(document).height()==$(window).scrollTop()+$(window).height()){
+        		    	   var page = $('#page').val();
+        		    	   page = parseInt(page) + 1;
+        		    	   $('#page').val(page);
+        		    	   newsFeedList(getParameter('tnGubun'));
+        		    	   //getBoardList(1);
+        		       }
+        		   });
+        	});
+        });
+        
+        function emotionToggle(tnNo){
+        	
+        	if( $('#feel_view_'+tnNo).hasClass('fade') ){
+        		$('#feel_view_'+tnNo).removeClass('fade')
+            	$('#feel_view_'+tnNo).fadeOut();
+        	}else{
+        		$('#feel_view_'+tnNo).addClass('fade');
+            	$('#feel_view_'+tnNo).fadeIn();
+        	}
+        }
+        
+        function goToView(tnNo){
+        	location.href = 'newsView.html?tnNo='+tnNo;
+        }
+        
+        function goToViewVote(tnNo){
+        	location.href = 'newsView_VoteA.html?tnNo='+tnNo;
+        }
+        
+        function loginCheck(){
+        	var memberId = window.localStorage.getItem("memberId");
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/loginCheck.do",
+  		        data: {
+  		        	"memberId"		:	memberId
+  		        },
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+  		        	if( res.status=="success" ){
+  		        		
+  		        	}else{
+  		        		window.localStorage.clear();
+  		        		location.href = "../member/login.html";
+  		        	}
+  		        }
+  		        
+  		        });
+        	
+        }
+        
+        function chulsuk(){
+        	var now = new Date();
+            var year= now.getFullYear();
+            var mon = (now.getMonth()+1)>9 ? ''+(now.getMonth()+1) : '0'+(now.getMonth()+1);
+            var day = now.getDate()>9 ? ''+now.getDate() : '0'+now.getDate();
+            var regDate = year + '-' + mon + '-' + day;
+            
+        	var chulsuk = window.localStorage.getItem("chulsuk");
+        	var memberId = window.localStorage.getItem("memberId");
+
+        	if( chulsuk != regDate ){
+        		$.ajax({
+      		        type: "POST",
+      		        url: serverUrl+"/addRank.do",
+      		        data: {
+      		        	"memberid"		:	memberId
+      		        	,"rkgubun"		: 	"01"
+      		        	,"rkboardkey"	:	"0"
+      		        },
+      		      	async: false,
+      		        dataType: "json", 
+      		        success: function(res) {
+      		        	if( res.status=="success" ){
+      		        		window.localStorage.setItem("chulsuk", regDate);
+      		        	}else{
+      		        		
+      		        	}
+      		        }
+      		        
+      		    });
+        	}
+
+        }
+        </script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+	<div class="pop_layer pop_p02">
+		<div class="pop_container">
+			<ul>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaotalk.png" alt="카카오톡" /></span> 카카오톡</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/kakaostory.png" alt="카카오스토리" /></span>카카오스토리</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/band.png" alt="네이버밴드" /></span>네이버 밴드</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/facebook.png" alt="페이스북" /></span>페이스북</a></li>
+				<li><a href="#none"><span class="sns"><img src="../img/sns/twitter.png" alt="트위터" /></span>트위터</a></li>
+			</ul>
+		</div>
+	</div><!-- // pop_up -->
+
+	<!-- header -->
+	<div id="header">
+		<div class="header_wrap">
+			<h1 class="logo"><a href="#none"><img src="../img/common/logo.png" alt="더불어민주당 메인페이지 가기" /></a></h1>
+			<a href="../news/newsSearch.html" class="total_search">통합검색</a>
+		</div>
+		<div class="gnb">
+			<ul>
+				<li class="on"><a href="../news/newsfeed.html?tnGubun=0">뉴스피드</a></li>
+				<li><a href="../talkRoom/talkRoomList.html">더톡</a></li>
+				<li><a href="../community/communityList.html">커뮤니티</a></li>
+				<li><a href="../volunteer/volunteerSearch.html">자원봉사</a></li>
+				<li><a href="../more/moreMenu.html"><img src="../img/icon/gnb_more.png" alt="더보기" /></a></li>
+			</ul>
+		</div>
+		<div class="gnb_sub">
+			<ul>
+				<li id="li1" class="liCheck"><a href="../news/newsfeed.html?tnGubun=1">브리핑</a></li>
+				<li id="li2" class="liCheck"><a href="../news/newsfeed.html?tnGubun=4">설문조사</a></li>
+				<li id="li3" class="liCheck"><a href="../news/newsfeed.html?tnGubun=3">캠페인</a></li>
+				<!-- <li class="not"><a href="#none">서명(청원)</a></li> -->
+			</ul>
+		</div>
+	</div><!-- // header -->
+	<!-- container -->
+	<div id="container">
+		<div class="news_grp">
+			<!-- hidden input -->
+			<input type="hidden" name="page" id="page" value="1">
+			<input type="hidden" name="paged" id="paged" value="0">
+			<!--// hidden input -->
+			
+			<!-- news_list 반복 -->
+			<div id="newsfeed">
+			<!-- <div class="news_list" id="news_list">
+				<div class="tit_grp">
+					<p class="div_value v2"><span class="hid">구분값 1번</span></p>
+					<div class="inner">
+						<p class="tit">뉴스피드 제목을 노출합니다.</p>
+						<p class="date">브리핑 &gt; 2016년 2월5일</p>
+					</div>
+				</div>
+				<div class="news_conts">
+					<a href="#none" class="text">홍길동과 함께하는 더불어민주당을 위한 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론 총선공약을 토론</a>
+				</div>
+				<div class="list_pic">
+					<img src="../img/sample_img01.png" alt="" />
+				</div>
+				<div class="list_count">
+					<ul>
+						<li>느낌 <span>0.000</span></li>
+						<li>댓글 <span>0.000</span></li>
+					</ul>
+				</div>
+				<div class="list_circlebtn">
+					<ul>
+						<li class="feel_wrap">
+							<a href="#none" class="feel_btn"><img src="../../img/icon/feel_icon.png" alt="느낌" /></a>
+							<ul class="feel_view">
+								<li><a href="#none"><img src="../../img/icon/circel_01.png" alt="좋아요" /></a></li>
+								<li><a href="#none"><img src="../../img/icon/circel_02.png" alt="힘내요" /></a></li>
+								<li><a href="#none"><img src="../../img/icon/circel_03.png" alt="슬퍼요" /></a></li>
+							</ul>
+						</li>
+						<li><a href="#none"><img src="../../img/icon/reply_icon.png" alt="댓글" /></a></li>
+					</ul>
+				</div>
+			</div> --><!-- // news_list -->
+			</div>
+			
+
+		</div><!-- // news_grp -->
+	</div><!-- // container -->
+</div>
+</body>
+</html>

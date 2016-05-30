@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }  
+        
+        function popup04() {
+        	var birthday = window.localStorage.getItem("birthday");
+        	if(birthday != null && birthday != "" && birthday.length > 7){
+        		toggleLayer($('.pop_p04'), 'on');
+        	}else{
+        		location.href ="../more/birthdayDtl.html";
+        	}
+        	
+        }
+        function popup05() {
+        	var sex = window.localStorage.getItem("sex");
+       		if("M" == sex || "F" == sex){
+       			toggleLayer($('.pop_p05'), 'on');
+       		}else {
+       			location.href ="../more/sexDtl.html";
+       		}
+        }
+        function popup06() {
+        	var sNo = window.localStorage.getItem("sNo");
+        	if(sNo != null &&  sNo > 0){
+        	toggleLayer($('.pop_p06'), 'on');
+        	}else{
+        		location.href ="../more/areaDtl.html";
+        	}
+        }
+        
+        function deleteMember(idStr) {
+        	 var memberId = window.localStorage.getItem("memberId");
+      	
+        	 var url ="";
+        	 
+        	 if(idStr == "birthday"){
+        		 url ="/tdd/member/updateMemberBirthday.do";
+        	 }else if(idStr == "sex"){
+        		 url ="/tdd/member/updateMemberSex.do";
+        	 }else if(idStr == "sNo"){
+        		 url ="/tdd/member/updateMemberSNo.do";
+        	 }else{
+        		 navigatorAlert("실패");
+        		 return;
+        	 }
+        	 
+       		 $.ajax({
+       		        type: "POST",
+       		        url: serverUrl+url,
+       		        data: {idStr: null,"memberId":memberId},
+       		        dataType: "json", 
+       		      	async: false,
+       		        success: function(res) {
+       	          		
+       		        	
+       		        	if(res.result == "S"){
+       		        		alert("삭제되었습니다.");
+       		        		window.localStorage.setItem(idStr,null);
+       		        		window.location.href = "../more/profileMenu.html";
+       		        	}else{
+       		        		navigatorAlert("실패되었습니다.");
+       		        	}
+       		        	
+       		        }
+       		    }); 
+        }
+       
+  		 
+  		 
+     $(function(){	
+    	 
+
+   		var memberId = window.localStorage.getItem("memberId");
+   		var memberName = window.localStorage.getItem("memberName");
+
+
+   		$("#memberName").html(memberName+'<span><img src="../img/icon/more_arw_icon.png" alt="이름편집 수정" /></span>');
+   		$("#memberId").html(memberId+'<span><img src="../img/icon/more_arw_icon.png" alt="패스워드" /></span>');
+   		
+   		var birthday = window.localStorage.getItem("birthday");
+
+   		if(birthday != null && birthday != "" && birthday.length > 7){
+   			
+   			$("#birthday").html(birthday.substr(0,4)+'.'+birthday.substr(4,2)+'.'+birthday.substr(6,2)+'<span><img src="../img/icon/more_arw_icon.png" alt="생년월일 수정" /></span>');
+   	   		
+   		}
+   		
+   		var sex = window.localStorage.getItem("sex");
+   		if("M" == sex){
+   			$("#sex").html('남<span><img src="../img/icon/more_arw_icon.png" alt="성별 수정" /> </span>');
+   		}else if("F" == sex){
+   			$("#sex").html('여<span><img src="../img/icon/more_arw_icon.png" alt="성별 수정" /> </span>');
+   		}
+   		
+   		var sNo = window.localStorage.getItem("sNo");
+   		if(sNo != null &&  sNo.length > 0){
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/more/selectSity.do",
+  		        data: {"sNo": sNo},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		
+  		        	var sity = res.resultData;
+  		        	$("#sNo").html(sity.sSiDo+' '+sity.sSiGunGu+'<span><img src="../img/icon/more_arw_icon.png" alt="지역구 위치 수정" /> </span>');
+  		        	$("#sNoStr").show();
+  		        	$("#sNoStr").text(memberName+"님의 지역은 "+sity.sSiDo+" "+sity.sElectionDistrict+" 지역구 입니다.");
+  		        }
+  		    }); 
+   		}
+   		
+   		
+        });
+
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<!-- pop_up -->
+	<div id="layMask"><!-- 마스크로 띄워질 Div --></div>
+
+	<div class="pop_layer pop_profile pop_p04">
+		<div class="pop_container">
+			<div class="pro_inner">
+				<a href="../more/birthdayDtl.html">생일수정</a>
+				<a href="javascript:;" onclick="deleteMember('birthday');">생일삭제</a>
+			</div>
+		</div>
+	</div>
+	<div class="pop_layer pop_profile pop_p05">
+		<div class="pop_container">
+			<div class="pro_inner">
+				<a href="../more/sexDtl.html">성별 수정</a>
+				<a href="javascript:;" onclick="deleteMember('sex');">성별 삭제</a>
+			</div>
+		</div>
+	</div>
+	<div class="pop_layer pop_profile pop_p06">
+		<div class="pop_container">
+			<div class="pro_inner">
+				<a href="../more/areaDtl.html">거주지 수정</a>
+				<a href="javascript:;" onclick="deleteMember('sNo');">거주지 삭제</a>
+			</div>
+		</div>
+	</div><!-- // pop_up -->
+	
+	<div id="header" class="view">
+		<div class="header_wrap">
+			<p class="header_subj">내 프로필</p>
+			<a href="../more/moreMenu.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<div id="container_sub">
+		<div class="profile_grp">
+			<p class="profile_pic">
+				<img src="../img/profile_sample.png"  />
+			</p>
+			<div class="profile_main view">
+				<ul>
+					<li class="p_list01"><a href="../more/nameDtl.html" id="memberName"></a></li>
+					<li class="p_list02"><a href="../more/pwdDtl.html" id="memberId"></a></li>
+					<li class="p_list04"><a href="#" onclick="popup04();" id="birthday">생년월일을 알려주세요. <span><img src="../img/icon/more_arw_icon.png" alt="생년월일 수정" /></span></a></li>
+					<li class="p_list05"><a href="#" onclick="popup05();" id="sex">성별을 알려주세요.  <span><img src="../img/icon/more_arw_icon.png" alt="성별 수정" /></span></a></li>
+					<li class="p_list06"><a href="#" onclick="popup06();" id="sNo">지역구가 어디신가요? <span><img src="../img/icon/more_arw_icon.png" alt="지역구 위치 수정" /> </span></a></li>
+					<li class="total" id="sNoStr" style="display: none;"></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
+
+
+

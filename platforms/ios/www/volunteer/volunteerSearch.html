@@ -1,0 +1,335 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+	  <script type="text/javascript" charset="utf-8">
+
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        
+        function regGo() {
+        	location.href='../volunteer/volunteerRegist.html'; 
+        }
+        function searchVolunteerBtn(){
+        	$("#initYN").val("Y");
+        	searchVolunteer();
+        }
+        function searchVolunteerScroll() {
+        	if($("#initYN").val() == "Y"){
+            	//페이지 초기화
+            	$("#page").val('1');
+            	$("#tListBody").html("");
+        	}
+        	
+        	searchVolunteerAjax("Y");
+        }
+        
+        function volunteerDtl(pVtrNo,vtrManCnt,vtrRecruitment) {
+        	var memberCode = window.localStorage.getItem("memberCode");
+        	
+        	if( vtrManCnt >= vtrRecruitment && memberCode =='04'){
+        		alert('인원이 마감되었습니다.');
+        		return;
+        	}else{
+	        	location.href = 'volunteerMan.html?vtrNo='+pVtrNo+'&vtrManCnt='+vtrManCnt+'&vtrRecruitment='+vtrRecruitment;
+        	}
+        }
+        
+        function searchVolunteerAjax(scrollYN) {
+        	var memberCode = window.localStorage.getItem("memberCode");
+        	
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectVolunteerList.do",
+  		        data: $("#searchForm").serialize(),
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+					
+  					if(res.resultLeng > 0){
+  						$('#tbMain').show();
+  	  	            	$.each(res.resultData, function() {
+  	  	            		var str ="";
+  	  	            		if("" == this.vtrSi){
+  	  	            			if( this.vtrManCnt >= this.vtrRecruitment ){
+  	  	            				str ='<tr class="pt_gray"><td class="tal"><a href="javascript:;" onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">전체</a></td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.memberName+'</td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrManCnt+'\/'+this.vtrRecruitment+'</td></tr>';
+  	  	            			}else{
+		  	  	            		str ='<tr><td class="tal"><a href="javascript:;" onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">전체</a></td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.memberName+'</td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrManCnt+'\/'+this.vtrRecruitment+'</td></tr>';
+  	  	            			}
+  	  	            		}else{
+  	  	            			if(this.vtrManCnt >= this.vtrRecruitment){
+  	  	            				str ='<tr class="pt_gray"><td class="tal"><a href="javascript:;" onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrSi+' '+this.vtrVoteGu+'</a></td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.memberName+'</td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrManCnt+'\/'+this.vtrRecruitment+'</td></tr>';
+  	  	            			}else{
+  	  	            				str ='<tr><td class="tal"><a href="javascript:;" onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrSi+' '+this.vtrVoteGu+'</a></td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.memberName+'</td><td  onclick="volunteerDtl('+this.vtrNo+','+this.vtrManCnt+','+this.vtrRecruitment+');">'+this.vtrManCnt+'\/'+this.vtrRecruitment+'</td></tr>';
+  	  	            			}
+  	  	            		}	
+  	  	            	
+  	  	            			$("#tListBody").append(str);
+  	  	                    
+  	  	                });
+  					}else{
+  						if(scrollYN == "N"){
+  							if(memberCode == '03' || memberCode == '04'){
+  								$("#tListBody").html("");
+  	  							$('#noSearchCd04').show();
+  	  							
+  	  						}else{
+  	  							$("#tListBody").html("");
+  	  							$('#noSearchCd00').show();
+  	  							
+  	  						}
+  						}
+  						
+  					}
+  	            	
+  		        }
+  		 }); 
+        }
+        
+        function searchVolunteer() {
+        	if($("#initYN").val() == "Y"){
+            	//페이지 초기화
+            	$("#page").val('1');
+            	$("#tListBody").html("");
+        	}
+        	
+        	searchVolunteerAjax("N");
+        	
+        }
+        
+        function siOnChange() {
+        	
+        	$("#vtrGu").empty();
+        	
+        	if(null==$("#vtrSi").val() || '' ==  $("#vtrSi").val()){
+        		return;
+        	}
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSityGunGuList.do",
+  		        data: {"sSiDo": $("#vtrSi").val()},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		console.log(res.resultData);
+  	            		var guCount = 0;
+  	            		 $.each(res.resultData, function() {
+  	            			if( guCount == 0 ){
+  	 	                    	 $("<option value='" + "'>" +"전체"+ "</option>").appendTo("#vtrGu");
+  	 	                       }else{
+  	 	                    	 $("<option value='" + this.sSiGunGu + "'>" + this.sSiGunGu + "</option>").appendTo("#vtrGu");
+  	 	                       }
+  	            			guCount++;
+  	                   });
+  	            	
+  		        }
+  		    }); 
+        }
+        
+        $(document).ready(function(){
+
+            
+        	var memberName = window.localStorage.getItem("memberName");
+        	var memberCode = window.localStorage.getItem("memberCode");
+
+        	//시도 셋팅
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSitySidoList.do",
+  		        data: {},
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+  	            	$.each(res.resultData, function() {
+  	                     $("<option value='" + this.sSiDo + "'>" + this.sSiDo + "</option>").appendTo("#vtrSi");
+  	                });
+  		        }
+  		    });
+        	
+        	
+
+        	searchVolunteer();
+
+    			//스크롤
+     		   $(window).scroll(function(){
+     		       if($(document).height()==$(window).scrollTop()+$(window).height()){
+     		    	 var page = $("#page").val();
+     		    	   page = parseInt(page) + 1;
+     		    	  $("#page").val(page);
+     		    	 $("#initYN").val("N");
+     		    	searchVolunteerScroll();
+     		       }
+     		   });
+    			
+    			
+    		//권한 메뉴관련
+     		  if(memberCode != '03' && memberCode != '04'){
+					$('#memberCodeCheck').show();
+			}
+    		
+     		//프로필 선거구 확인
+     		 var sNo = window.localStorage.getItem("sNo");
+     		
+        		if(sNo != null &&  sNo > 0){
+             	$.ajax({
+       		        type: "POST",
+       		        url: serverUrl+"/tdd/more/selectSity.do",
+       		        data: {"sNo": sNo},
+       		        dataType: "json", 
+       		      	async: false,
+       		        success: function(res) {
+       	            		
+       		        	var sity = res.resultData;
+       		      
+       		        	var str ='<p><strong>'+memberName+'</strong>님의 지역은</p>';
+                		str +='<p><strong>'+sity.sSiDo+' '+sity.sElectionDistrict+'</strong> 지역구입니다.</p>';
+                    	
+                    	$("#sitySearch").html(str);
+       		        	
+       		        }
+       		    }); 
+        		}else{
+        			var str ='<p>등록하신 거주지역이 없으시네요.</p>';
+            		str +='<p>지금 등록하러 가시겠습니까? <a href="../more/profileMenu.html" class="link">&gt; 내프로필이동 </a></p>';
+                	
+                	$("#sitySearch").html(str);
+        		}
+            	
+            	
+        });
+        
+  
+
+</script>  
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<!-- header -->
+	<div id="header" class="h_c_03">
+		<div class="header_wrap">
+			<h1 class="logo"><a href="../news/newsfeed.html"><img src="../img/common/logo.png" alt="더불어민주당 메인페이지 가기" /></a></h1>
+<!-- 			<a href="#" class="arw_btn"><img src="../img/icon/share_icon_02.png" alt="공유하기" /></a> -->
+		</div>
+		<div class="gnb">
+			<ul>
+				<li><a href="../news/newsfeed.html?tnGubun=0">뉴스피드</a></li>
+				<li><a href="../talkRoom/talkRoomList.html">더톡</a></li>
+				<li><a href="../community/communityList.html">커뮤니티</a></li>
+				<li class="on"><a href="../volunteer/volunteerSearch.html">자원봉사</a></li>
+				<li><a href="../more/moreMenu.html"><img src="../img/icon/gnb_more.png" alt="더보기" /></a></li>	
+			</ul>
+		</div>
+		<div class="gnb_sub res" id="memberCodeCheck" style="display: none;">
+			<ul>
+				<li class="on"><a href="#">자원봉사</a></li>
+				<li><a href="../volunteer/volunteerRegist.html">자원봉사 등록</a></li>
+			</ul>
+		</div>
+	</div><!-- // header -->
+	<!-- container -->
+	<div id="container">
+
+		<div class="resource_main">
+			
+			<div class="res_box" id="sitySearch">
+<!-- 				<p><strong>홍길동</strong>님의 지역은</p> -->
+<!-- 				<p><strong>서울시 강남구 '을'</strong> 지역구입니다.</p> -->
+				
+<!-- 				<p>등록하신 거주지역이 없으시네요.</p> -->
+<!-- 				<p>지금 등록하러 가시겠습니까? <a href="#none" class="link">&gt; 내프로필이동 </a></p> -->
+			</div>
+
+			<div class="inform">
+				<p>원하는 자원 봉사를 쉽고 빠르게 찾아보세요.</p>
+			</div>
+<form id="searchForm">
+<input type="hidden"  id="page" name="page" value="1"/>
+<input type="hidden"  id="initYN" name="initYN" value="Y"/>
+			<div class="city_form">
+
+				<div class="select_wrap">
+					<div class="select_grp">
+						<select name="vtrSi" id="vtrSi" onchange="siOnChange();">
+						<option value='' >전체</option>
+						</select>
+					</div>
+					<div class="select_grp">
+						<select name="vtrGu" id="vtrGu">
+						<option value='' >전체</option>
+						</select>
+					</div>
+				</div>
+<!-- 				기획상으로 제외 20160214 -->
+<!-- 				<div class="select_grp_03"> -->
+<!-- 					<select name="vtrField" id="vtrField"> -->
+<!-- 						<option value='' >자원봉사분야</option> -->
+<!-- 						<option value='01' >온라인</option> -->
+<!-- 						<option value='02' >오프라인</option> -->
+<!-- 						<option value='03' >온+오프라인</option> -->
+<!-- 					</select> -->
+<!-- 				</div> -->
+<!-- 				20160217 검색조건 안보이게 하라고 요청 -->
+				<div class="input_grp" style="display: none;">
+					<input type="text" class="txt place_01" placeholder="담당자,내용을 통해 검색할 수 있습니다."  maxlength="100" id="vtrContent" name="vtrContent" value=""/>
+				</div>
+		
+				<a onclick="searchVolunteerBtn();" class="btn btn_full btn_f_02 btnC_04">
+					<span>검색하기</span>
+				</a>
+				<!-- 의원,더벤저스 검색된 것이 없을 때 -->
+				<div class="not_search" id="noSearchCd00" style="display: none;">
+					<p>찾으시는 자원봉사가 없으신가요?</p>
+					<p>직접 자원봉사를 등록하여 참여할 수 있습니다.</p>
+					<span class="btn btnC_03 btn_p_03">
+						<input type="button" value="자원봉사 등록하러 가기" onclick="regGo();"/>
+					</span>
+				</div>
+				<!-- 사용자,당원 검색된 것이 없을 때 -->
+				<div class="not_search" id="noSearchCd04" style="display: none;">
+					<p>검색된 자원봉사가 없습니다.</p>
+					<p>다시 검색해 주세요.</p>
+				</div>
+				
+				<div class="tbl_type_01 v2 mt10" id="tbMain" style="display: none;">
+					<table>
+						<caption>거주지 검색폼</caption>
+						<colgroup>
+							<col />
+							<col style="width:25%" />
+							<col style="width:30%" />
+						</colgroup>
+						<thead>
+							<tr>
+								<th scope="col">지역</th>
+								<th scope="col">담당자</th>
+								<th scope="col">참여인원</th>
+							</tr>
+						</thead>
+						<tbody id="tListBody">
+						</tbody>
+					</table>
+				</div>
+			</div>
+</form>
+		</div>
+	</div><!-- // container -->
+</div>
+</body>
+</html>
+
+
+

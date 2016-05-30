@@ -1,0 +1,287 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../jquery/phonegap-1.4.1.js"></script>
+<script type="text/javascript"  src="../js/common/common.js"></script>
+<script type="text/javascript" charset="utf-8">
+      
+      var onDeviceReady = function() {
+
+      }; 
+
+        function init() {
+            document.addEventListener("deviceready", onDeviceReady, false);
+        }
+        
+        
+        function siOnChange() {
+        	$("#vtrGu").empty();
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSityGunGuList.do",
+  		        data: {"sSiDo": $("#vtrSi").val()},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		console.log(res.resultData);
+  	            		 $.each(res.resultData, function() {
+  	                       
+  	                     $("<option value='" + this.sSiGunGu + "'>" + this.sSiGunGu + "</option>").appendTo("#vtrGu");
+  	                   });
+  	            	
+  		        }
+  		    }); 
+        	
+        	gunGuOnChange();
+        }
+        
+
+		
+		function gunGuOnChange() {
+        	$("#vtrVoteGu").empty();
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSityElectionDistrictList.do",
+  		        data: {"sSiDo": $("#vtrSi").val(),"sSiGunGu" : $("#vtrGu").val()},
+  		        dataType: "json", 
+  		      	async: false,
+  		        success: function(res) {
+  	            		console.log(res.resultData);
+  	            		 $.each(res.resultData, function() {
+  	                    	 $("<option value='" + this.sElectionDistrict + "'>" + this.sElectionDistrict + "</option>").appendTo("#vtrVoteGu");
+  	                   });
+  	            	
+  		        }
+  		    }); 
+        }
+        
+		function regVolunteer() {
+			if(confirm("등록 하시겠습니까?")) {
+				if($('#telNo').val() == ""){
+	          		alert("대표번호를 입력 해주세요.");
+	          		$('#telNo').focus();
+	          		return;
+	          	}
+// 				var tel = $('#telNo').val();
+// 				tel = tel.replace("-", "");
+// 				if(tel.length < 9){
+// 	          		alert("대표번호를 정확히 입력 해주세요.");
+// 	          		$('#telNo').focus();
+// 	          		return;
+// 	          	}
+				
+				if($('#vtrRecruitment').val() == ""){
+					navigatorAlert("모집인원을 입력 해주세요.");
+	          		$('#vtrRecruitment').focus();
+	          		return;
+	          	}
+				if($('#vtrField').val() == ""){
+					navigatorAlert("자원봉사분야를 입력 해주세요.");
+	          		$('#vtrField').focus();
+	          		return;
+	          	}
+				if($('#vtrContent').val() == ""){
+					navigatorAlert("내용을 입력 해주세요.");
+	          		$('#vtrContent').focus();
+	          		return;
+	          	}
+
+				//날짜를 DB에 등록하기 위해 셋팅
+				var sDateTime = $("#sDateTime").val();
+				var eDateTime = $("#eDateTime").val();
+				var arrSdate = sDateTime.split('T');
+				var arrEdate = eDateTime.split('T');
+
+				$("#vtrPossibleDate").val(arrSdate[0]);
+				$("#vtrPossibleHour").val(arrSdate[1].split(':')[0]);
+				$("#vtrPossibleMinute").val(arrSdate[1].split(':')[1].replace("Z", ""));
+				
+				$("#vtrEndDate").val(arrEdate[0]);
+				$("#vtrEndHour").val(arrEdate[1].split(':')[0]);
+				$("#vtrEndMinute").val(arrEdate[1].split(':')[1].replace("Z", ""));
+				
+// 				$('#telNo').val(tel);
+				$.ajax({
+	  		        type: "POST",
+	  		        url: serverUrl+"/tdd/volunteer/insertVolunteer.do",
+	  		        data: $("#regForm").serialize(),
+	  		      	async: false,
+	  		        dataType: "json", 
+	  		        success: function(res) {
+	  		        	
+	  		        	if(res.result == "S"){
+	  		        		navigatorAlert("등록되었습니다.");
+	  		        		location.replace("../volunteer/volunteerSearch.html");
+	  		        	}else{
+	  		        		navigatorAlert("실패되었습니다.");
+	  		        	}
+	  	            	
+	  		        }
+	  		    }); 
+			} 
+		}
+		
+		
+        $(document).ready(function(){
+        	 
+        	//이름 및 아이디 셋팅
+        	var memberId = window.localStorage.getItem("memberId");
+        	var memberName = window.localStorage.getItem("memberName");
+        	$('#memberName').val(memberName);
+        	$('#memberId').val(memberId);
+        	
+        	//시도 셋팅
+        	$.ajax({
+  		        type: "POST",
+  		        url: serverUrl+"/tdd/volunteer/selectSitySidoList.do",
+  		        data: {},
+  		      	async: false,
+  		        dataType: "json", 
+  		        success: function(res) {
+					
+  	            	$.each(res.resultData, function() {
+  	                     $("<option value='" + this.sSiDo + "'>" + this.sSiDo + "</option>").appendTo("#vtrSi");
+  	                });
+  	            	
+  	            	
+  	          
+  		        }
+  		    }); 
+        	
+        	//선택된 시도의 군구 셋팅
+        	siOnChange();
+        	
+        	//선택된 군구의 선거구 셋팅
+        	gunGuOnChange();
+        	
+        	
+        	//2014-01-02T11:42:13
+        	//현재 날짜 셋팅 
+        	$("#sDateTime").val(nowDateFormat()+"T00:00");
+        	$("#eDateTime").val(nowDateFormat()+"T00:00");
+        	
+        });
+
+        
+
+</script> 
+</head>
+<body onload="init();" id="stage" class="theme">
+<div id="wrap">
+	<div id="header" class="view h_c_03">
+		<div class="header_wrap">
+			<p class="header_subj">자원봉사 등록하기</p>
+			<a href="../volunteer/volunteerSearch.html" class="back_btn"><span class="hid">뒤로가기</span></a>
+		</div>
+	</div>
+	<form id="regForm" >
+			<input type="hidden" class="txt"  id="vtrPossibleDate" name="vtrPossibleDate" value=""/>
+			<input type="hidden" class="txt"  id="vtrPossibleHour" name="vtrPossibleHour" value=""/>
+			<input type="hidden" class="txt"  id="vtrPossibleMinute" name="vtrPossibleMinute" value=""/>
+			<input type="hidden" class="txt"  id="vtrEndDate" name="vtrEndDate" value=""/>
+			<input type="hidden" class="txt"  id="vtrEndHour" name="vtrEndHour" value=""/>
+			<input type="hidden" class="txt"  id="vtrEndMinute" name="vtrEndMinute" value=""/>
+			<input type="hidden" class="txt"  id="memberId" name="memberId" value=""/>
+	<div id="container_sub">
+		<div class="resource_grp">
+			<div class="tbl_type_02">
+				<table>
+					<caption>자원봉사 등록 표</caption>
+					<colgroup>
+						<col style="width:105px;" />
+						<col />
+					</colgroup>
+					<tbody>
+						<tr>
+							<th scope="row">이름</th>
+								<td>
+									<input type="text" id="memberName" name="memberName"  class="txt" placeholder="이름을 입력하세요." readonly="readonly" />
+								</td>
+						</tr>
+						<tr>
+							<th scope="row">대표번호</th>
+							<td><input type="tel" class="txt" id="telNo" name="telNo"  placeholder="대표번호를 입력하세요." /></td>
+						</tr>
+						<tr>
+							<th scope="row">지역선택</th>
+							<td>
+								<div class="select_wrap w2">
+									<div class="select_grp">
+											<select id="vtrSi" name="vtrSi" onchange="siOnChange();" >
+											<option value='' >전체</option>
+										</select>
+									</div>
+									<div class="select_grp">
+										<select id="vtrGu" name="vtrGu" onchange="gunGuOnChange();">
+											<option value='' >전체</option>
+										</select>
+									</div>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">선거구 선택</th>
+							<td>
+								<div class="select_grp_04">
+									<select name="vtrVoteGu" id="vtrVoteGu">
+										
+									</select>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">가능시간</th>
+							<td class="time t2">
+								<input type="datetime-local" class="txt" id="sDateTime" name="sDateTime" value="" onchange="console.log(this.value);"/>
+								<span class="block">
+								<span class="slash"> ~ </span>
+								<input type="datetime-local" class="txt" id="eDateTime" name="eDateTime" value="" />
+								</span>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">자원봉사분야</th>
+							<td>
+								<div class="select_grp_04">
+								<input type="text" id="vtrField" name="vtrField"  class="txt" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">모집인원</th>
+							<td>
+								<div class="input_grp_02">
+									<input type="tel" class="txt w100 tar"  id="vtrRecruitment" name="vtrRecruitment" maxlength="3"/>
+									<span>명</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row">내용</th>
+							<td><textarea class="area_01" placeholder="모집하고자 하는 자원봉사 내용을 입력하세요." id="vtrContent" name="vtrContent"></textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="btn_half mt10">
+				<a href="../volunteer/volunteerSearch.html" class="btn btnC_03 btn_full btn_f_02">
+					<span>취소</span>
+				</a>
+				<span class="btn btnC_04 btn_full btn_f_02">
+					<input type="button" value="등록하기"  onclick="regVolunteer();" />
+				</span>
+			</div>
+
+		</div>
+	</div>
+	</form>
+</div>
+</body>
+</html>

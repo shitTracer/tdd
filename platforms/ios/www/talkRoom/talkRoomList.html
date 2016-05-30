@@ -1,0 +1,202 @@
+<!DOCTYPE HTML>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi" />
+<title>더불어민주당</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<link rel="stylesheet" type="text/css" href="../css/base.css">
+<script type="text/javascript" src="../js/jquery-1.10.2.min.js"></script>
+<script type="text/javascript" src="../js/common.js"></script>
+<script type="text/javascript" src="../js/common/common.js"></script>
+
+<script type="text/javascript" charset="utf-8">
+
+//var v_serverUrl = "http://122.99.170.157:8080";
+//var v_serverUrl = "http://122.99.170.230/test";
+
+function push(){
+	var pushmsg = $('#pushmsg').val();
+	 $.ajax({
+	        type: "POST",
+	        url: serverUrl+"/chatPush.do",
+	        data: {
+	        	"pushmsg" 		: pushmsg
+	        },
+	        dataType: "json", 
+	        success: function(res) {
+	        	//alert(res.result);
+         	if(res.result=="success") {
+         		alert('알림 성공');
+         	}else{
+         		alert('알림 실패');
+         	}
+	        }
+	 });
+}
+
+function fnChatList() {
+	try{
+		var loginMemberId = window.localStorage.getItem('memberId');
+		var loginMemberName = window.localStorage.getItem('memberName');
+		
+		 $('#chatlist').empty();    
+
+    	var values = []; 
+    	
+		//alert('aa');
+   		 $.ajax({
+		        type: "POST",
+		        url: serverUrl+"/talk/selectTalkList.do",
+		        data: {
+		        	"trNo" 		: $('#trNo').val()
+		        	, "searchText" 		: $('#searchText').val()
+		        },
+		        dataType: "json", 
+		        success: function(res) {
+		        	//alert(res.result);
+	            	if(res.result=="success") {
+	            		//alert(res.result);
+	            		
+	            		
+	            		values = res.list;
+	            		
+	            		var html = "<ul>";
+	            		
+	                    $.each(values, function( index, value ) {
+	                    	
+	                    	var trNo				= value.trNo;
+	                    	var memberId			= value.memberId;
+	                    	var ornerInYn			= value.ornerInYn;
+	                    	var trTitle				= value.trTitle;
+	                    	var trYear				= value.trYear;
+	                    	var trMonth				= value.trMonth;
+	                    	var trDay				= value.trDay;
+	                    	var trHour				= value.trHour;
+	                    	var trMinite			= value.trMinite;
+	                    	var trRoomInMember		= value.trRoomInMember;
+							var memberName			=  value.memberName;
+							
+	                    	//alert(trNo);
+	                    	
+	                    	html += '<li class="amend_add">';
+	                    	html += '<a href="javascript:fnTalkRoom(' + trNo + ', \'' + memberId + '\', \'' + memberName+ '\', \'' + trRoomInMember + '\')" class="talk_list">';
+	                    	
+	                    	if(ornerInYn == "Y") {
+	                    		html += '<p class="name"><em class="accent">' + memberName + '</em> <span>' + trRoomInMember + '명</span></p>';
+	                    		html += '<input type="hidden" id="pushmsg" value="'+trTitle+'">';
+	                    	} else {
+	                    		html += '<p class="name">' + memberName + '<span>' + trRoomInMember + '명</span></p>';
+	                    	}
+                            html += '<input type="hidden" id="roomMember_'+trNo+'" value="'+trRoomInMember+'" >';
+
+	                    	html += '<div class="talk_cts">';
+                            html += '<p class="tit" id="title_'+trNo+'">' + trTitle + '</p>';
+	                    	html += '<p class="date">톡 시작 ' + trYear + '.' + trMonth + '.' + trDay + ' ' + trHour + ':' + trMinite + '</p>';
+	                    	html += '</div>';
+	                    	html += '</a>';
+	                    	if(loginMemberId == memberId) {
+		                    	html += '<a href="javascript:fnTalkUpdate(' + trNo + ');" class="amend">';
+		                    	html += '<p><img src="../img/icon/amend_icon.png" alt=""/><span>수정하기</span></p>';
+		                    	html += '</a>';
+		                    	html += '<input type="hidden" id="pushmsg" value="'+trTitle+'">';
+	                    	}
+
+	                    	
+	                    	html += '</li>';
+	                    	
+	                    	
+	                     });
+	                    
+	                    html += '</ul>';
+	                   
+	                    //alert(html);
+	                    $('#chatlist').append(html);
+	            	}
+		        }
+		   }); 
+   		 
+	}catch(e) {alert(e);}
+
+    }
+    
+	function fnTalkUpdate(trNo) {
+		location.href = "./talkRoomUpdate.html?trNo=" + trNo;
+	}
+    
+    
+	function fnTalkRoom(trNo, roomOrnerId, roomOrnerName, roomMember) {
+		
+		//alert(roomOrnerName);
+		
+		try {
+			var memberId = window.localStorage.getItem('memberId');
+			var memberCode = window.localStorage.getItem('memberCode');
+			var memberName =  window.localStorage.getItem('memberName'); 
+			
+			if(memberId == "") {
+				alert("로그인 후 입장 가능합니다.");
+			} else {
+				if(navigator.userAgent.toLowerCase().indexOf('android')>=0) {  // 안드로이드
+					//alert(memberName + ':' + roomMember);
+					window.CallApp.fnTalkRoom(memberId, trNo, memberCode, memberName, roomOrnerId, roomOrnerName, roomMember);
+				} else { // 아이폰
+					var roomOrnerId = window.localStorage.getItem('roomOrnerId'); 
+					var title = $("#title_"+trNo).text();
+                    var roomMember = $("#roomMember_"+trNo).val();
+                    location.href = "./talkRoomIndex.html?memberId=" + memberId + "&trNo=" + trNo + "&memberName=" + memberName + "&roomOrnerId=" + roomOrnerId + "&roomOrnerName=" + roomOrnerName + "&memberCode=" + memberCode +"&title="+title + "&roomMember="+roomMember;
+				}
+			}
+
+		} catch(e){
+			alert(e);
+		}
+	}
+	
+	$( document ).ready(function() { 
+		fnChatList();
+        /* var memberCode = window.localStorage.getItem('memberCode');
+		if( memberCode == '02'){
+			$('#pushAlertButton').attr('style', 'display:block');
+		}else{
+			$('#pushAlertButton').attr('style', 'display:none');
+		} */
+	});
+	
+</script>
+</head>
+<body>
+<div id="wrap">
+	<!-- header -->
+	<div id="header" class="h_c_02">
+		<div class="header_wrap h_c_02">
+			<h1 class="logo"><a href="#none"><img src="../img/common/logo.png" alt="더불어민주당 메인페이지 가기" /></a></h1>
+			 <!-- <div id="pushAlertButton">
+                        <a href="javascript:push();" class="push_btn">알림</a>
+             </div> -->
+		</div>
+		<div class="gnb">
+			<ul>
+				<li><a href="../news/newsfeed.html?tnGubun=0">뉴스피드</a></li>
+				<li class="on"><a href="../talkRoom/talkRoomList.html">더톡</a></li>
+				<li><a href="../community/communityList.html">커뮤니티</a></li>
+				<li><a href="../volunteer/volunteerSearch.html">자원봉사</a></li>
+				<li><a href="../more/moreMenu.html"><img src="../img/icon/gnb_more.png" alt="더보기" /></a></li>		
+			</ul>
+		</div>
+		<div class="all_search_grp v2">
+			<input id="searchText" name="searchText" type="text" class="txt" placeholder="채팅방 이름,참여자 검색" />
+			<span class="btn btnC_02 btn_p_03">
+				<input type="button" onClick="javascript:fnChatList();" value="검색" />
+			</span>
+		</div>
+		
+	</div><!-- // header -->
+	<div id="container">
+		<div id="chatlist" class="talk_grp">
+
+		</div>
+	</div>
+</div>
+</body>
+</html>
